@@ -1,0 +1,39 @@
+using Garage.Repositories;
+using Garage.Services;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+builder.Services.AddControllers();
+builder.Services.AddSingleton<TreatmentService>(); // i added
+builder.Services.AddSingleton<GarageService>();
+builder.Services.AddSingleton<IGarageRepository, GarageRepository>();
+builder.Services.AddSingleton<QueueProcessorService>();
+
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+// i added
+var queueProcessor = app.Services.GetRequiredService<QueueProcessorService>();
+_ = queueProcessor.StartProcessingAsync(); 
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>(); // i added
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
