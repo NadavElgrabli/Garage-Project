@@ -1,16 +1,26 @@
 ﻿using Garage.Enums;
 using Garage.Models;
-using Garage.Data;
+using Garage.Repositories;
 
 namespace Garage.Services;
 
 public class QueueProcessorService
 {
-    private readonly TreatmentService _treatmentService;
+    private readonly ITreatmentService _fuelService;
+    private readonly ITreatmentService _chargeService;
+    private readonly ITreatmentService _inflateService;
+    private readonly IQueueRepository _queueRepository;
 
-    public QueueProcessorService(TreatmentService treatmentService)
+    public QueueProcessorService(
+        ITreatmentService fuelService,
+        ITreatmentService chargeService,
+        ITreatmentService inflateService,
+        IQueueRepository queueRepository)
     {
-        _treatmentService = treatmentService;
+        _fuelService = fuelService;
+        _chargeService = chargeService;
+        _inflateService = inflateService;
+        _queueRepository = queueRepository;
     }
 
     public async Task StartProcessingAsync()
@@ -19,32 +29,38 @@ public class QueueProcessorService
         _ = Task.Run(() => ProcessChargeQueueAsync());
         _ = Task.Run(() => ProcessAirQueueAsync());
     }
-
+    
     private async Task ProcessFuelQueueAsync()
     {
         while (true)
         {
-            if (!InMemoryDatabase.FuelStationRequests.TryPeek(out var fuelRequest))
+            // Checks the first car in the fuel queue (without removing it) and assign to fuelRequest.
+            if (!_queueRepository.TryPeekFuelRequest(out var fuelRequest))
             {
+                //If the queue is empty: wait 100ms and try again.
                 await Task.Delay(100);
                 continue;
             }
 
             var vehicle = fuelRequest.Vehicle;
 
-            if (vehicle.Status == Status.Ready)
+            if (!_fuelService.IsMatch(vehicle))
             {
-                InMemoryDatabase.FuelStationRequests.TryDequeue(out _); // remove it
+                _queueRepository.TryDequeueFuelRequest(out _); // remove it
                 continue;
             }
-
-            if (vehicle.Status != Status.InTreatment && vehicle.TreatmentTypes.Contains(TreatmentType.Refuel))
+            
+            // if its available and needs refueling
+            if (vehicle.Status != Status.InTreatment)
             {
-                if (InMemoryDatabase.FuelStationRequests.TryDequeue(out var readyRequest))
+                // remove from the queue and begin refueling
+                if (_queueRepository.TryDequeueFuelRequest(out var readyRequest))
                 {
                     try
                     {
-                        await _treatmentService.RefuelAsync(readyRequest.Vehicle, readyRequest.RequestedLiters);
+                        float price = await _fuelService.TreatAsync(readyRequest.Vehicle, 
+                            readyRequest.RequestedLiters);
+                        readyRequest.Vehicle.TreatmentsPrice += price;
                     }
                     catch (Exception ex)
                     {
@@ -54,23 +70,27 @@ public class QueueProcessorService
             }
             else
             {
-                // Vehicle is either in treatment or doesn't need refuel
-                if (InMemoryDatabase.FuelStationRequests.TryDequeue(out var currentRequest))
+                // can't refuel now - vehicle is currently in treatment
+                if (_queueRepository.TryDequeueFuelRequest(out var currentRequest))
                 {
                     bool requeued = false;
 
+                    // Currently pumping air but needs also to refuel
                     if (currentRequest.Vehicle.Status == Status.InTreatment &&
-                        currentRequest.Vehicle.TreatmentTypes.Contains(TreatmentType.Refuel))
+                        _fuelService.IsMatch(currentRequest.Vehicle))
                     {
-                        if (InMemoryDatabase.FuelStationRequests.TryPeek(out var nextRequest) &&
+                        // if there is a next vehicle in the queue that can cut the current vehicle
+                        if (_queueRepository.TryPeekFuelRequest(out var nextRequest) &&
                             nextRequest.Vehicle.Status != Status.InTreatment &&
-                            nextRequest.Vehicle.TreatmentTypes.Contains(TreatmentType.Refuel))
+                            _fuelService.IsMatch(nextRequest.Vehicle))
                         {
-                            if (InMemoryDatabase.FuelStationRequests.TryDequeue(out var cutterRequest))
+                            // cut in line
+                            if (_queueRepository.TryDequeueFuelRequest(out var cutterRequest))
                             {
                                 try
                                 {
-                                    await _treatmentService.RefuelAsync(cutterRequest.Vehicle, cutterRequest.RequestedLiters);
+                                    float price = await _fuelService.TreatAsync(cutterRequest.Vehicle, cutterRequest.RequestedLiters);
+                                    cutterRequest.Vehicle.TreatmentsPrice += price;
                                 }
                                 catch (Exception ex)
                                 {
@@ -81,19 +101,23 @@ public class QueueProcessorService
                             // Re-queue the original busy vehicle at the front
                             var tempQueue = new Queue<FuelRequest>();
                             tempQueue.Enqueue(currentRequest);
-                            while (InMemoryDatabase.FuelStationRequests.TryDequeue(out var item))
+
+                            // Drain the rest of the FuelStationRequests queue into the temp queue, in order
+                            var drainedQueue = _queueRepository.DrainFuelQueue();
+                            foreach (var item in drainedQueue)
                                 tempQueue.Enqueue(item);
 
-                            foreach (var item in tempQueue)
-                                InMemoryDatabase.FuelStationRequests.Enqueue(item);
+                            // Rebuild the FuelStationRequests queue with the updated order.
+                            _queueRepository.RebuildFuelQueue(tempQueue);
 
                             requeued = true;
                         }
                     }
 
+                    // If there was no cutter, just put the current vehicle back at the end, wait a bit, and retry.
                     if (!requeued)
                     {
-                        InMemoryDatabase.FuelStationRequests.Enqueue(currentRequest);
+                        _queueRepository.EnqueueFuelRequest(currentRequest);
                         await Task.Delay(100);
                     }
                 }
@@ -101,180 +125,198 @@ public class QueueProcessorService
         }
     }
 
-    private async Task ProcessChargeQueueAsync()
+private async Task ProcessChargeQueueAsync()
 {
     while (true)
     {
-        if (InMemoryDatabase.ChargeStationRequests.TryPeek(out var chargeRequest))
+        // Checks the first car in the charge queue (without removing it) and assign to chargeRequest.
+        if (!_queueRepository.TryPeekChargeRequest(out var chargeRequest))
         {
-            var vehicle = chargeRequest.Vehicle;
+            // If the queue is empty: wait 100ms and try again.
+            await Task.Delay(100);
+            continue;
+        }
 
-            if (vehicle.Status == Status.Ready)
-            {
-                InMemoryDatabase.ChargeStationRequests.TryDequeue(out _);
-                continue;
-            }
+        var vehicle = chargeRequest.Vehicle;
 
-            if (vehicle.Status != Status.InTreatment && vehicle.TreatmentTypes.Contains(TreatmentType.Recharge))
+        if (!_chargeService.IsMatch(vehicle))
+        {
+            _queueRepository.TryDequeueChargeRequest(out _); // remove it
+            continue;
+        }
+        
+        // if vehicle is available and needs recharge
+        if (vehicle.Status != Status.InTreatment && _chargeService.IsMatch(vehicle))
+        {
+            // remove from the queue and begin charging
+            if (_queueRepository.TryDequeueChargeRequest(out var readyRequest))
             {
-                if (InMemoryDatabase.ChargeStationRequests.TryDequeue(out var readyRequest))
+                try
                 {
-                    try
-                    {
-                        await _treatmentService.RechargeAsync(readyRequest.Vehicle, readyRequest.RequestedHoursToCharge);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Charging error: {ex.Message}");
-                    }
+                    float price = await _chargeService.TreatAsync(readyRequest.Vehicle, 
+                        readyRequest.RequestedHoursToCharge);
+                    readyRequest.Vehicle.TreatmentsPrice += price;
                 }
-            }
-            else if (vehicle.Status == Status.InTreatment && vehicle.TreatmentTypes.Contains(TreatmentType.Recharge))
-            {
-                if (InMemoryDatabase.ChargeStationRequests.TryDequeue(out var waitingRequest))
+                catch (Exception ex)
                 {
-                    var tempQueue = new Queue<ChargeRequest>();
-                    bool treatmentStarted = false;
-
-                    while (!treatmentStarted)
-                    {
-                        await Task.Delay(100);
-
-                        if (waitingRequest.Vehicle.Status != Status.InTreatment)
-                        {
-                            try
-                            {
-                                await _treatmentService.RechargeAsync(waitingRequest.Vehicle, waitingRequest.RequestedHoursToCharge);
-                                treatmentStarted = true;
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"Charging error (delayed): {ex.Message}");
-                                break;
-                            }
-                        }
-                        else if (InMemoryDatabase.ChargeStationRequests.TryDequeue(out var nextRequest))
-                        {
-                            tempQueue.Enqueue(waitingRequest);
-                            try
-                            {
-                                await _treatmentService.RechargeAsync(nextRequest.Vehicle, nextRequest.RequestedHoursToCharge);
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"Charging error (pass-through): {ex.Message}");
-                            }
-
-                            // Restore queue
-                            while (InMemoryDatabase.ChargeStationRequests.TryDequeue(out var remaining))
-                                tempQueue.Enqueue(remaining);
-
-                            foreach (var req in tempQueue)
-                                InMemoryDatabase.ChargeStationRequests.Enqueue(req);
-
-                            break;
-                        }
-                    }
+                    Console.WriteLine($"Charging error: {ex.Message}");
                 }
-            }
-            else
-            {
-                InMemoryDatabase.ChargeStationRequests.TryDequeue(out _);
             }
         }
         else
         {
-            await Task.Delay(100);
+            // can't charge now - vehicle is either already being treated or not ready
+            if (_queueRepository.TryDequeueChargeRequest(out var currentRequest))
+            {
+                bool requeued = false;
+
+                // Currently in another treatment but needs also to recharge
+                if (currentRequest.Vehicle.Status == Status.InTreatment &&
+                    _chargeService.IsMatch(currentRequest.Vehicle))
+                {
+                    // if there is a next vehicle in the queue that can cut the current vehicle
+                    if (_queueRepository.TryPeekChargeRequest(out var nextRequest) &&
+                        nextRequest.Vehicle.Status != Status.InTreatment &&
+                        _chargeService.IsMatch(nextRequest.Vehicle))
+                    {
+                        // cut in line
+                        if (_queueRepository.TryDequeueChargeRequest(out var cutterRequest))
+                        {
+                            try
+                            {
+                                float price = await _chargeService.TreatAsync(
+                                    cutterRequest.Vehicle, cutterRequest.RequestedHoursToCharge);
+                                cutterRequest.Vehicle.TreatmentsPrice += price;
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Charging error (cutter): {ex.Message}");
+                            }
+                        }
+
+                        // Re-queue the original busy vehicle at the front
+                        var tempQueue = new Queue<ChargeRequest>();
+                        tempQueue.Enqueue(currentRequest);
+
+                        // Drain the rest of the ChargeStationRequests queue into the temp queue, in order
+                        var drainedQueue = _queueRepository.DrainChargeQueue();
+                        foreach (var item in drainedQueue)
+                            tempQueue.Enqueue(item);
+
+                        // Rebuild the ChargeStationRequests queue with the updated order.
+                        _queueRepository.RebuildChargeQueue(tempQueue);
+
+                        requeued = true;
+                    }
+                }
+
+                // If there was no cutter, just put the current vehicle back at the end, wait a bit, and retry.
+                if (!requeued)
+                {
+                    _queueRepository.EnqueueChargeRequest(currentRequest);
+                    await Task.Delay(100);
+                }
+            }
         }
     }
 }
 
 
-    private async Task ProcessAirQueueAsync()
+private async Task ProcessAirQueueAsync()
 {
     while (true)
     {
-        if (InMemoryDatabase.AirStationRequests.TryPeek(out var airRequest))
+        // Checks the first car in the air queue (without removing it) and assign to airRequest.
+        if (!_queueRepository.TryPeekAirRequest(out var airRequest))
         {
-            var vehicle = airRequest.Vehicle;
+            // If the queue is empty: wait 100ms and try again.
+            await Task.Delay(100);
+            continue;
+        }
 
-            if (vehicle.Status == Status.Ready)
-            {
-                InMemoryDatabase.AirStationRequests.TryDequeue(out _);
-                continue;
-            }
+        var vehicle = airRequest.Vehicle;
 
-            if (vehicle.Status != Status.InTreatment && vehicle.TreatmentTypes.Contains(TreatmentType.Inflate))
+        if (!_inflateService.IsMatch(vehicle))
+        {
+            _queueRepository.TryDequeueAirRequest(out _); // remove it
+            continue;
+        }
+
+        if (vehicle.Status != Status.InTreatment && _inflateService.IsMatch(vehicle))
+        {
+            // remove from the queue and begin inflating
+            if (_queueRepository.TryDequeueAirRequest(out var readyRequest))
             {
-                if (InMemoryDatabase.AirStationRequests.TryDequeue(out var readyRequest))
+                try
                 {
-                    try
-                    {
-                        await _treatmentService.InflateTiresAsync(readyRequest.Vehicle, readyRequest.DesiredWheelPressures);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Air inflation error: {ex.Message}");
-                    }
+                    float price = await _inflateService.TreatAsync(
+                        readyRequest.Vehicle, readyRequest.DesiredWheelPressures);
+                    readyRequest.Vehicle.TreatmentsPrice += price;
                 }
-            }
-            else if (vehicle.Status == Status.InTreatment && vehicle.TreatmentTypes.Contains(TreatmentType.Inflate))
-            {
-                if (InMemoryDatabase.AirStationRequests.TryDequeue(out var waitingRequest))
+                catch (Exception ex)
                 {
-                    var tempQueue = new Queue<AirRequest>();
-                    bool treatmentStarted = false;
-
-                    while (!treatmentStarted)
-                    {
-                        await Task.Delay(100);
-
-                        if (waitingRequest.Vehicle.Status != Status.InTreatment)
-                        {
-                            try
-                            {
-                                await _treatmentService.InflateTiresAsync(waitingRequest.Vehicle, waitingRequest.DesiredWheelPressures);
-                                treatmentStarted = true;
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"Air inflation error (delayed): {ex.Message}");
-                                break;
-                            }
-                        }
-                        else if (InMemoryDatabase.AirStationRequests.TryDequeue(out var nextRequest))
-                        {
-                            tempQueue.Enqueue(waitingRequest);
-                            try
-                            {
-                                await _treatmentService.InflateTiresAsync(nextRequest.Vehicle, nextRequest.DesiredWheelPressures);
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"Air inflation error (pass-through): {ex.Message}");
-                            }
-
-                            while (InMemoryDatabase.AirStationRequests.TryDequeue(out var remaining))
-                                tempQueue.Enqueue(remaining);
-
-                            foreach (var req in tempQueue)
-                                InMemoryDatabase.AirStationRequests.Enqueue(req);
-
-                            break;
-                        }
-                    }
+                    Console.WriteLine($"Air inflation error: {ex.Message}");
                 }
-            }
-            else
-            {
-                InMemoryDatabase.AirStationRequests.TryDequeue(out _);
             }
         }
         else
         {
-            await Task.Delay(100);
+            // can't inflate now - vehicle is already in another treatment
+            if (_queueRepository.TryDequeueAirRequest(out var currentRequest))
+            {
+                bool requeued = false;
+
+                // Currently in treatment but also needs air
+                if (currentRequest.Vehicle.Status == Status.InTreatment &&
+                    _inflateService.IsMatch(currentRequest.Vehicle))
+                {
+                    // if a next vehicle can cut in
+                    if (_queueRepository.TryPeekAirRequest(out var nextRequest) &&
+                        nextRequest.Vehicle.Status != Status.InTreatment &&
+                        _inflateService.IsMatch(nextRequest.Vehicle))
+                    {
+                        // cut in line
+                        if (_queueRepository.TryDequeueAirRequest(out var cutterRequest))
+                        {
+                            try
+                            {
+                                float price = await _inflateService.TreatAsync(
+                                    cutterRequest.Vehicle, cutterRequest.DesiredWheelPressures);
+                                cutterRequest.Vehicle.TreatmentsPrice += price;
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Air inflation error (cutter): {ex.Message}");
+                            }
+                        }
+
+                        // Re-queue the original busy vehicle at the front
+                        var tempQueue = new Queue<AirRequest>();
+                        tempQueue.Enqueue(currentRequest);
+
+                        // Drain and rebuild queue
+                        var drainedQueue = _queueRepository.DrainAirQueue();
+                        foreach (var item in drainedQueue)
+                            tempQueue.Enqueue(item);
+
+                        _queueRepository.RebuildAirQueue(tempQueue);
+
+                        requeued = true;
+                    }
+                }
+
+                // If there was no cutter, just put the current vehicle back at the end and wait
+                if (!requeued)
+                {
+                    _queueRepository.EnqueueAirRequest(currentRequest);
+                    await Task.Delay(100);
+                }
+            }
         }
     }
 }
+
+
+
 
 }

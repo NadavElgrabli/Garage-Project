@@ -59,7 +59,7 @@ public class GarageRepository : IGarageRepository
 
         if (request.TreatmentTypes.Count is > 2 or < 1)
         {
-            throw new InvalidOperationException("Number of treatments must be between 1 and 2");
+            throw new InvalidOperationException("Number of treatments must be between 1 or 2");
         }
         
         if (request.Engine.CurrentEnergy > request.Engine.MaxEnergy)

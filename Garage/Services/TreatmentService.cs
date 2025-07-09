@@ -125,38 +125,4 @@ public class TreatmentService
             GarageState.AirStationsRequestsSemaphore.Release();
         }
     }
-
-    public async Task<float> HandleAirOrFuelTreatmentAsync(FuelRequest fuelRequest, AirRequest airRequest)
-    {
-        float totalPrice = 0;
-
-        if (fuelRequest.Vehicle.TreatmentTypes.Contains(TreatmentType.Inflate))
-        {
-            totalPrice += await InflateTiresAsync(fuelRequest.Vehicle, airRequest.DesiredWheelPressures);
-        }
-
-        if (fuelRequest.Vehicle.TreatmentTypes.Contains(TreatmentType.Refuel))
-        {
-            totalPrice += await RefuelAsync(fuelRequest.Vehicle, fuelRequest.RequestedLiters);
-        }
-        
-        return totalPrice;
-    }
-
-    public async Task<float> HandleAirOrRechargeTreatmentAsync(ChargeRequest chargeRequest, AirRequest airRequest)
-    {
-        float totalPrice = 0;
-
-        if (chargeRequest.Vehicle.TreatmentTypes.Contains(TreatmentType.Inflate))
-        {
-            totalPrice += await InflateTiresAsync(chargeRequest.Vehicle, airRequest.DesiredWheelPressures);
-        }
-
-        if (chargeRequest.Vehicle.TreatmentTypes.Contains(TreatmentType.Recharge))
-        {
-            totalPrice += await RechargeAsync(chargeRequest.Vehicle, chargeRequest.RequestedHoursToCharge);
-        }
-        
-        return totalPrice;
-    }
 }

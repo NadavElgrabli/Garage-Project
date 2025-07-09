@@ -10,12 +10,10 @@ namespace Garage.Controllers;
 [Route("api/[controller]")]
 public class GarageController : ControllerBase
 {
-    private readonly TreatmentService _treatmentService;
     private readonly GarageService _garageService;
 
-    public GarageController(TreatmentService treatmentService, GarageService garageService)
+    public GarageController(GarageService garageService)
     {
-        _treatmentService = treatmentService;
         _garageService = garageService;
     }
 
@@ -44,7 +42,7 @@ public class GarageController : ControllerBase
     }
 
     [HttpPost("GetVehicleByLicensePlate")]
-    public async Task<IActionResult> GetVehicleByLicensePlate([FromQuery] string licensePlate)
+    public IActionResult GetVehicleByLicensePlate([FromQuery] string licensePlate)
     {
         var v = _garageService.GetVehicleByLicensePlate(licensePlate);
         if (v == null)
@@ -70,9 +68,6 @@ public class GarageController : ControllerBase
         var chargeRequest = _garageService.CreateChargeRequest(car, request.HoursToCharge);
         var airRequest = _garageService.CreateAirRequest(car, request.DesiredWheelPressures);
         _garageService.AddAndEnqueElectricVehicle(chargeRequest, airRequest);
-
-        var totalPrice = await _treatmentService.HandleAirOrRechargeTreatmentAsync(chargeRequest, airRequest);
-        car.TreatmentsPrice = totalPrice;
         
         return Ok("Electric car added successfully");
     }
@@ -93,9 +88,6 @@ public class GarageController : ControllerBase
         var fuelRequest = _garageService.CreateFuelRequest(car, request.LitersToFuel);
         var airRequest = _garageService.CreateAirRequest(car, request.DesiredWheelPressures);
         _garageService.AddAndEnqueFuelVehicle(fuelRequest, airRequest);
-
-        var totalPrice = await _treatmentService.HandleAirOrFuelTreatmentAsync(fuelRequest, airRequest);
-        fuelRequest.Vehicle.TreatmentsPrice = totalPrice;
         
         return Ok("Fuel car added successfully");
     }
