@@ -67,7 +67,8 @@ public class GarageController : ControllerBase
         var car = _garageService.CreateElectricCar(request);
         var chargeRequest = _garageService.CreateChargeRequest(car, request.HoursToCharge);
         var airRequest = _garageService.CreateAirRequest(car, request.DesiredWheelPressures);
-        _garageService.AddAndEnqueElectricVehicle(chargeRequest, airRequest);
+        _garageService.AddVehicleToGarage(car);
+        _garageService.EnqueVehicle(chargeRequest, airRequest);
         
         return Ok("Electric car added successfully");
     }
@@ -87,7 +88,8 @@ public class GarageController : ControllerBase
         var car = _garageService.CreateFuelCar(request);
         var fuelRequest = _garageService.CreateFuelRequest(car, request.LitersToFuel);
         var airRequest = _garageService.CreateAirRequest(car, request.DesiredWheelPressures);
-        _garageService.AddAndEnqueFuelVehicle(fuelRequest, airRequest);
+        _garageService.AddVehicleToGarage(car);
+        _garageService.EnqueVehicle(fuelRequest, airRequest);
         
         return Ok("Fuel car added successfully");
     }

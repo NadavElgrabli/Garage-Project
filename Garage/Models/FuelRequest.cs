@@ -1,4 +1,4 @@
-﻿using Garage.Models;
+﻿namespace Garage.Models;
 
 public class FuelRequest : TreatmentRequest
 {

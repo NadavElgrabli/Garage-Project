@@ -7,8 +7,8 @@ public class InMemoryDatabase
 {
     public static Dictionary<string, Vehicle> Vehicles { get; set; } = new();
     
-    public static ConcurrentQueue<FuelRequest> FuelStationRequests = new();
-    public static ConcurrentQueue<ChargeRequest> ChargeStationRequests { get; set; } = new();
-    public static ConcurrentQueue<AirRequest> AirStationRequests { get; set; } = new();
+    public static ConcurrentQueue<TreatmentRequest> FuelStationRequests = new();
+    public static ConcurrentQueue<TreatmentRequest> ChargeStationRequests { get; set; } = new();
+    public static ConcurrentQueue<TreatmentRequest> AirStationRequests { get; set; } = new();
 
 }

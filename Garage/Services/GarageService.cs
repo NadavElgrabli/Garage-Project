@@ -22,17 +22,15 @@ public class GarageService
     {
         return _garageRepository.CheckValidFuelCarInput(request);
     }
-    
-    public void AddAndEnqueFuelVehicle(FuelRequest fuelRequest, AirRequest airRequest)
-    {
-        _garageRepository.AddAndEnqueFuelVehicle(fuelRequest, airRequest);
-    }
-    
-    
 
-    public void AddAndEnqueElectricVehicle(ChargeRequest chargeRequest, AirRequest airRequest)
+    public void AddVehicleToGarage(Vehicle vehicle)
     {
-        _garageRepository.AddAndEnqueElectricVehicle(chargeRequest, airRequest);
+        _garageRepository.AddVehicleToGarage(vehicle);
+    }
+
+    public void EnqueVehicle(TreatmentRequest firstRequest, TreatmentRequest secondRequest)
+    {
+        _garageRepository.EnqueVehicle(firstRequest, secondRequest);
     }
     
     public Vehicle? GetVehicleByLicensePlate(string licensePlate)

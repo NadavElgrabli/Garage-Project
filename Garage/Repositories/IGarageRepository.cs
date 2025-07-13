@@ -5,10 +5,9 @@ namespace Garage.Repositories;
 
 public interface IGarageRepository
 {
-    void AddAndEnqueFuelVehicle(FuelRequest fuelRequest,  AirRequest airRequest);
-    void AddAndEnqueElectricVehicle(ChargeRequest chargeRequest, AirRequest airRequest);
-
-
+    void AddVehicleToGarage(Vehicle vehicle);
+    void EnqueVehicle(TreatmentRequest firstRequest, TreatmentRequest secondRequest);
+    
     Vehicle? GetVehicleByLicensePlate(string licensePlate);
     Task CheckValidElectricCarInput(AddElectricCarRequest request);
     Task CheckValidFuelCarInput(AddFuelCarRequest request);

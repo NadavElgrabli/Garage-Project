@@ -6,35 +6,29 @@ namespace Garage.Repositories;
 
 public class GarageRepository : IGarageRepository
 {
-    public void AddAndEnqueFuelVehicle(FuelRequest fuelRequest,  AirRequest airRequest)
+    public void EnqueVehicle(TreatmentRequest firstRequest, TreatmentRequest secondRequest)
     {
-        InMemoryDatabase.Vehicles.Add(fuelRequest.Vehicle.LicensePlate, fuelRequest.Vehicle);
-
-        if (fuelRequest.Vehicle.TreatmentTypes.Contains(TreatmentType.Inflate))
+        if (firstRequest.Vehicle.TreatmentTypes.Contains(TreatmentType.Refuel))
         {
-            InMemoryDatabase.AirStationRequests.Enqueue(airRequest);
+            InMemoryDatabase.FuelStationRequests.Enqueue(firstRequest);
+        }
+        
+        else if (firstRequest.Vehicle.TreatmentTypes.Contains(TreatmentType.Recharge))
+        {
+            InMemoryDatabase.ChargeStationRequests.Enqueue(firstRequest);
         }
 
-        if (fuelRequest.Vehicle.TreatmentTypes.Contains(TreatmentType.Refuel))
+        if (secondRequest.Vehicle.TreatmentTypes.Contains(TreatmentType.Inflate))
         {
-            InMemoryDatabase.FuelStationRequests.Enqueue(fuelRequest);
+            InMemoryDatabase.AirStationRequests.Enqueue(secondRequest);
         }
     }
     
-    public void AddAndEnqueElectricVehicle(ChargeRequest  chargeRequest,  AirRequest airRequest)
+    public void AddVehicleToGarage(Vehicle vehicle)
     {
-        InMemoryDatabase.Vehicles.Add(chargeRequest.Vehicle.LicensePlate, chargeRequest.Vehicle);
-
-        if (chargeRequest.Vehicle.TreatmentTypes.Contains(TreatmentType.Inflate))
-        {
-            InMemoryDatabase.AirStationRequests.Enqueue(airRequest);
-        }
-        
-        if (chargeRequest.Vehicle.TreatmentTypes.Contains(TreatmentType.Recharge))
-        {
-            InMemoryDatabase.ChargeStationRequests.Enqueue(chargeRequest);
-        }
+        InMemoryDatabase.Vehicles.Add(vehicle.LicensePlate, vehicle);
     }
+    
     
     public Vehicle? GetVehicleByLicensePlate(string licensePlate)
     {
