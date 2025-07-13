@@ -8,21 +8,25 @@ public class GarageRepository : IGarageRepository
 {
     public void EnqueVehicle(TreatmentRequest firstRequest, TreatmentRequest secondRequest)
     {
-        if (firstRequest.Vehicle.TreatmentTypes.Contains(TreatmentType.Refuel))
+        foreach (var treatmentType in firstRequest.Vehicle.TreatmentTypes)
         {
-            InMemoryDatabase.FuelStationRequests.Enqueue(firstRequest);
-        }
-        
-        else if (firstRequest.Vehicle.TreatmentTypes.Contains(TreatmentType.Recharge))
-        {
-            InMemoryDatabase.ChargeStationRequests.Enqueue(firstRequest);
+            if (InMemoryDatabase.TreatmentQueues.ContainsKey(treatmentType))
+            {
+                var queue = InMemoryDatabase.TreatmentQueues[treatmentType];
+                queue.Enqueue(firstRequest);
+            }
         }
 
-        if (secondRequest.Vehicle.TreatmentTypes.Contains(TreatmentType.Inflate))
+        foreach (var treatmentType in secondRequest.Vehicle.TreatmentTypes)
         {
-            InMemoryDatabase.AirStationRequests.Enqueue(secondRequest);
+            if (InMemoryDatabase.TreatmentQueues.ContainsKey(treatmentType))
+            {
+                var queue = InMemoryDatabase.TreatmentQueues[treatmentType];
+                queue.Enqueue(secondRequest);
+            }
         }
     }
+
     
     public void AddVehicleToGarage(Vehicle vehicle)
     {

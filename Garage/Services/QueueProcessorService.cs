@@ -25,11 +25,11 @@ public class QueueProcessorService
             .Select(service => Task.Run(() => ProcessQueueAsync(service)))
             .ToList();
 
-        await Task.WhenAll(processingTasks);
+        //await Task.WhenAll(processingTasks);
     }
 
     
-    public async Task ProcessQueueAsync(ITreatmentService  treatmentService)
+    public async Task ProcessQueueAsync(ITreatmentService treatmentService)
     {
         while (true)
         {
@@ -41,17 +41,18 @@ public class QueueProcessorService
             }
 
             var vehicle = request.Vehicle;
-
+            
+            // if it doesn't need the treatment TODO: Delete "if"
             if (!treatmentService.IsMatch(vehicle))
             {
                 _queueRepository.TryDequeueRequest(treatmentService, out _); // remove it
                 continue;
             }
             
-            // if its available and needs treatment
+            // if its available and needs the treatment TODO: Check how to avoid two tasks to enter this "if" at the same time
             if (vehicle.Status != Status.InTreatment)
             {
-                // remove from the queue and begin treatment
+                // remove from the queue and begin treatment TODO: maybe different name for readyRequest
                 if (_queueRepository.TryDequeueRequest(treatmentService, out var readyRequest))
                 {
                     try
@@ -73,16 +74,16 @@ public class QueueProcessorService
                 {
                     bool requeued = false;
 
-                    // Currently in treatment but also needs another treatment
+                    // Currently in treatment but also needs another treatment TODO: this if is redundant
                     if (currentRequest.Vehicle.Status == Status.InTreatment &&
                         treatmentService.IsMatch(currentRequest.Vehicle))
                     {
-                        // if there is a next vehicle in the queue that can cut the current vehicle
+                        // if there is a next vehicle in the queue that can cut the current vehicle TODO: delete the isMAtch from the if statement
                         if (_queueRepository.TryPeekRequest(treatmentService, out var nextRequest) &&
                             nextRequest.Vehicle.Status != Status.InTreatment &&
                             treatmentService.IsMatch(nextRequest.Vehicle))
                         {
-                            // cut in line
+                            // cut in line TODO: 2 tasks can enter the if at the same time, and both will go through treatment
                             if (_queueRepository.TryDequeueRequest(treatmentService, out var cutterRequest))
                             {
                                 try
@@ -95,7 +96,7 @@ public class QueueProcessorService
                                     Console.WriteLine($"Treatment error (cutter): {ex.Message}");
                                 }
                             }
-
+                            //TODO: the whole block use in a seperate function called: Put back the request in the first place in the que
                             // Re-queue the original busy vehicle at the front
                             var tempQueue = new Queue<TreatmentRequest>();
                             tempQueue.Enqueue(currentRequest);

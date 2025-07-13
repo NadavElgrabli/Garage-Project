@@ -68,6 +68,7 @@ public class GarageController : ControllerBase
         var chargeRequest = _garageService.CreateChargeRequest(car, request.HoursToCharge);
         var airRequest = _garageService.CreateAirRequest(car, request.DesiredWheelPressures);
         _garageService.AddVehicleToGarage(car);
+        // TODO: Add the EnqueVehicle to the QueueProcessor service
         _garageService.EnqueVehicle(chargeRequest, airRequest);
         
         return Ok("Electric car added successfully");
