@@ -11,10 +11,12 @@ namespace Garage.Controllers;
 public class GarageController : ControllerBase
 {
     private readonly GarageService _garageService;
+    private readonly QueueProcessorService _queueProcessorService;
 
-    public GarageController(GarageService garageService)
+    public GarageController(GarageService garageService,  QueueProcessorService queueProcessorService)
     {
         _garageService = garageService;
+        _queueProcessorService = queueProcessorService;
     }
 
     [HttpPost("InitializeGarage")]
@@ -68,8 +70,7 @@ public class GarageController : ControllerBase
         var chargeRequest = _garageService.CreateChargeRequest(car, request.HoursToCharge);
         var airRequest = _garageService.CreateAirRequest(car, request.DesiredWheelPressures);
         _garageService.AddVehicleToGarage(car);
-        // TODO: Add the EnqueVehicle to the QueueProcessor service
-        _garageService.EnqueVehicle(chargeRequest, airRequest);
+        _queueProcessorService.EnqueVehicle(chargeRequest, airRequest);
         
         return Ok("Electric car added successfully");
     }
@@ -90,7 +91,7 @@ public class GarageController : ControllerBase
         var fuelRequest = _garageService.CreateFuelRequest(car, request.LitersToFuel);
         var airRequest = _garageService.CreateAirRequest(car, request.DesiredWheelPressures);
         _garageService.AddVehicleToGarage(car);
-        _garageService.EnqueVehicle(fuelRequest, airRequest);
+        _queueProcessorService.EnqueVehicle(fuelRequest, airRequest);
         
         return Ok("Fuel car added successfully");
     }

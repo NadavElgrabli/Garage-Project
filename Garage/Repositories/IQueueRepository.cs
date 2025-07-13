@@ -5,7 +5,7 @@ namespace Garage.Repositories;
 
 public interface IQueueRepository
 {
-    // For all types
+    void EnqueVehicle(TreatmentRequest firstRequest, TreatmentRequest secondRequest);
     bool TryPeekRequest(ITreatmentService treatmentService, out TreatmentRequest? request);
     bool TryDequeueRequest(ITreatmentService treatmentService, out TreatmentRequest? request);
     Queue<TreatmentRequest> DrainQueue(ITreatmentService treatmentService);

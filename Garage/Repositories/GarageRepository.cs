@@ -6,33 +6,10 @@ namespace Garage.Repositories;
 
 public class GarageRepository : IGarageRepository
 {
-    public void EnqueVehicle(TreatmentRequest firstRequest, TreatmentRequest secondRequest)
-    {
-        foreach (var treatmentType in firstRequest.Vehicle.TreatmentTypes)
-        {
-            if (InMemoryDatabase.TreatmentQueues.ContainsKey(treatmentType))
-            {
-                var queue = InMemoryDatabase.TreatmentQueues[treatmentType];
-                queue.Enqueue(firstRequest);
-            }
-        }
-
-        foreach (var treatmentType in secondRequest.Vehicle.TreatmentTypes)
-        {
-            if (InMemoryDatabase.TreatmentQueues.ContainsKey(treatmentType))
-            {
-                var queue = InMemoryDatabase.TreatmentQueues[treatmentType];
-                queue.Enqueue(secondRequest);
-            }
-        }
-    }
-
-    
     public void AddVehicleToGarage(Vehicle vehicle)
     {
         InMemoryDatabase.Vehicles.Add(vehicle.LicensePlate, vehicle);
     }
-    
     
     public Vehicle? GetVehicleByLicensePlate(string licensePlate)
     {

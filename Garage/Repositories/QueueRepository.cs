@@ -1,5 +1,4 @@
 ﻿using Garage.Data;
-using Garage.Enums;
 using Garage.Models;
 using Garage.Services;
 
@@ -7,14 +6,32 @@ namespace Garage.Repositories;
 
 public class QueueRepository : IQueueRepository
 {
-    
+    public void EnqueVehicle(TreatmentRequest firstRequest, TreatmentRequest secondRequest)
+    {
+        foreach (var treatmentType in firstRequest.Vehicle.TreatmentTypes)
+        {
+            if (InMemoryDatabase.TreatmentQueues.ContainsKey(treatmentType))
+            {
+                var queue = InMemoryDatabase.TreatmentQueues[treatmentType];
+                queue.Enqueue(firstRequest);
+            }
+        }
+
+        foreach (var treatmentType in secondRequest.Vehicle.TreatmentTypes)
+        {
+            if (InMemoryDatabase.TreatmentQueues.ContainsKey(treatmentType))
+            {
+                var queue = InMemoryDatabase.TreatmentQueues[treatmentType];
+                queue.Enqueue(secondRequest);
+            }
+        }
+    }
+
     // Tries to get the first request in the corresponding queue without removing it.
     // Returns true if successful and out the request, false if the queue is empty.
-    //InMemoryDatabase.RequestsQueues[treatmentService.GetTreatmentType()]
     public bool TryPeekRequest(ITreatmentService treatmentService, out TreatmentRequest? request)
     {
         request = null;
-
         var treatmentType = treatmentService.GetTreatmentType();
 
         if (InMemoryDatabase.TreatmentQueues.ContainsKey(treatmentType))
@@ -27,7 +44,6 @@ public class QueueRepository : IQueueRepository
                 return true;
             }
         }
-
         return false;
     }
 

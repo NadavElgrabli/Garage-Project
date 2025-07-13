@@ -28,6 +28,10 @@ public class QueueProcessorService
         //await Task.WhenAll(processingTasks);
     }
 
+    public void EnqueVehicle(TreatmentRequest firstRequest, TreatmentRequest secondRequest)
+    {
+        _queueRepository.EnqueVehicle(firstRequest, secondRequest);
+    }
     
     public async Task ProcessQueueAsync(ITreatmentService treatmentService)
     {

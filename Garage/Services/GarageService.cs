@@ -27,11 +27,6 @@ public class GarageService
     {
         _garageRepository.AddVehicleToGarage(vehicle);
     }
-
-    public void EnqueVehicle(TreatmentRequest firstRequest, TreatmentRequest secondRequest)
-    {
-        _garageRepository.EnqueVehicle(firstRequest, secondRequest);
-    }
     
     public Vehicle? GetVehicleByLicensePlate(string licensePlate)
     {
