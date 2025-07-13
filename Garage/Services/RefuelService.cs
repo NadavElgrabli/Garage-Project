@@ -6,10 +6,12 @@ namespace Garage.Services;
 
 public class RefuelService : ITreatmentService
 {
-    public async Task<float> TreatAsync(Vehicle vehicle, object data)
+    public async Task<float> TreatAsync(Vehicle vehicle, TreatmentRequest request)
     {
-        if (data is not float litersToFuel)
-            throw new ArgumentException("Invalid data for refueling");
+        if (request is not FuelRequest fuelRequest)
+            throw new ArgumentException("Invalid data type. Expected FuelRequest.");
+
+        float litersToFuel = fuelRequest.RequestedLiters;
 
         await GarageState.FuelStationsRequestsSemaphore.WaitAsync();
         await GarageState.WorkersSemaphore.WaitAsync();
@@ -45,4 +47,9 @@ public class RefuelService : ITreatmentService
 
     public bool IsMatch(Vehicle vehicle) =>
         vehicle.TreatmentTypes.Contains(TreatmentType.Refuel);
+
+    public TreatmentType GetTreatmentType()
+    {
+        return TreatmentType.Refuel;
+    }
 }

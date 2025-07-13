@@ -27,6 +27,8 @@ public class GarageService
     {
         _garageRepository.AddAndEnqueFuelVehicle(fuelRequest, airRequest);
     }
+    
+    
 
     public void AddAndEnqueElectricVehicle(ChargeRequest chargeRequest, AirRequest airRequest)
     {

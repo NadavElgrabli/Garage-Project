@@ -1,7 +1,6 @@
 ﻿namespace Garage.Models;
 
-public class ChargeRequest
+public class ChargeRequest : TreatmentRequest
 {
-    public Vehicle Vehicle { get; set; }
     public float RequestedHoursToCharge { get; set; }
 }

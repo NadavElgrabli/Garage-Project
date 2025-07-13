@@ -1,4 +1,5 @@
 ﻿using Garage.Models;
+using Garage.Services;
 
 namespace Garage.Repositories;
 
@@ -28,4 +29,11 @@ public interface IQueueRepository
 
     Queue<AirRequest> DrainAirQueue();
     void RebuildAirQueue(Queue<AirRequest> reorderedQueue);
+    
+    // For all types
+    bool TryPeekRequest(ITreatmentService treatmentService, out TreatmentRequest request);
+    bool TryDequeueRequest(ITreatmentService treatmentService, out TreatmentRequest request);
+    Queue<TreatmentRequest> DrainQueue(ITreatmentService treatmentService);
+    void RebuildQueue(ITreatmentService treatmentService, Queue<TreatmentRequest> reorderedQueue);
+    void EnqueueRequest(ITreatmentService treatmentService, TreatmentRequest request);
 }

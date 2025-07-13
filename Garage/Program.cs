@@ -5,7 +5,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddSingleton<TreatmentService>(); // i added
 builder.Services.AddSingleton<ITreatmentService, RefuelService>();
 builder.Services.AddSingleton<ITreatmentService, RechargeService>();
 builder.Services.AddSingleton<ITreatmentService, InflateService>();
@@ -13,16 +12,6 @@ builder.Services.AddSingleton<GarageService>();
 builder.Services.AddSingleton<IGarageRepository, GarageRepository>();
 builder.Services.AddSingleton<IQueueRepository, QueueRepository>();
 builder.Services.AddSingleton<QueueProcessorService>();
-// // For QueueProcessorService specifically:
-// builder.Services.AddSingleton<QueueProcessorService>(provider =>
-// {
-//     var fuel = provider.GetRequiredService<RefuelService>();
-//     var charge = provider.GetRequiredService<RechargeService>();
-//     var air = provider.GetRequiredService<InflateService>();
-//     var repo = provider.GetRequiredService<IQueueRepository>();
-//
-//     return new QueueProcessorService(fuel, charge, air, repo);
-// });
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

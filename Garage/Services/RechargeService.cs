@@ -6,10 +6,12 @@ namespace Garage.Services;
 
 public class RechargeService : ITreatmentService
 {
-    public async Task<float> TreatAsync(Vehicle vehicle, object data)
+    public async Task<float> TreatAsync(Vehicle vehicle, TreatmentRequest request)
     {
-        if (data is not float hoursToCharge)
-            throw new ArgumentException("Invalid data for recharging");
+        if (request is not ChargeRequest chargeRequest)
+            throw new ArgumentException("Invalid data type. Expected ChargeRequest.");
+
+        float hoursToCharge = chargeRequest.RequestedHoursToCharge;
 
         await GarageState.ChargeStationsRequestsSemaphore.WaitAsync();
         await GarageState.WorkersSemaphore.WaitAsync();
@@ -48,4 +50,9 @@ public class RechargeService : ITreatmentService
 
     public bool IsMatch(Vehicle vehicle) =>
         vehicle.TreatmentTypes.Contains(TreatmentType.Recharge);
+
+    public TreatmentType GetTreatmentType()
+    {
+        return TreatmentType.Recharge;
+    }
 }

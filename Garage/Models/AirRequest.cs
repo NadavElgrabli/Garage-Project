@@ -1,7 +1,6 @@
 ﻿namespace Garage.Models;
 
-public class AirRequest
+public class AirRequest : TreatmentRequest
 {
-    public Vehicle Vehicle { get; set; }
     public List<float> DesiredWheelPressures { get; set; }
 }

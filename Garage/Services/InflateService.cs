@@ -6,10 +6,12 @@ namespace Garage.Services;
 
 public class InflateService : ITreatmentService
 {
-    public async Task<float> TreatAsync(Vehicle vehicle, object data)
+    public async Task<float> TreatAsync(Vehicle vehicle, TreatmentRequest request)
     {
-        if (data is not List<float> desiredPressures)
-            throw new ArgumentException("Invalid data for inflating tires");
+        if (request is not AirRequest airRequest)
+            throw new ArgumentException("Invalid data type. Expected AirRequest.");
+
+        List<float> desiredPressures = airRequest.DesiredWheelPressures;
 
         await GarageState.AirStationsRequestsSemaphore.WaitAsync();
         await GarageState.WorkersSemaphore.WaitAsync();
@@ -52,4 +54,9 @@ public class InflateService : ITreatmentService
 
     public bool IsMatch(Vehicle vehicle) =>
         vehicle.TreatmentTypes.Contains(TreatmentType.Inflate);
+
+    public TreatmentType GetTreatmentType()
+    {
+        return TreatmentType.Inflate;
+    }
 }

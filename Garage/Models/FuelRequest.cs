@@ -1,8 +1,7 @@
 ﻿using Garage.Models;
 
-public class FuelRequest
+public class FuelRequest : TreatmentRequest
 {
-    public Vehicle Vehicle { get; set; }
     public float RequestedLiters { get; set; }
     
 }
