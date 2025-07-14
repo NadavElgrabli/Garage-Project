@@ -110,4 +110,27 @@ public class GarageService
     {
         return _garageRepository.DisplayVehiclesByStatus(status);
     }
+    
+    public (TreatmentRequest FirstRequest, TreatmentRequest SecondRequest) PrepareElectricCar(AddElectricCarRequest request)
+    {
+        var car = CreateElectricCar(request);
+        var chargeRequest = CreateChargeRequest(car, request.HoursToCharge);
+        var airRequest = CreateAirRequest(car, request.DesiredWheelPressures);
+        AddVehicleToGarage(car);
+
+        return (chargeRequest, airRequest);
+    }
+
+    public (TreatmentRequest FirstRequest, TreatmentRequest SecondRequest) PrepareFuelCar(AddFuelCarRequest request)
+    {
+        var car = CreateFuelCar(request);
+        var fuelRequest = CreateFuelRequest(car, request.LitersToFuel);
+        var airRequest = CreateAirRequest(car, request.DesiredWheelPressures);
+        AddVehicleToGarage(car);
+
+        return (fuelRequest, airRequest);
+    }
+
+    
+    
 }

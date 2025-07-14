@@ -60,19 +60,14 @@ public class GarageController : ControllerBase
         try
         {
             await _garageService.CheckValidElectricCarInput(request);
+            var (chargeRequest, airRequest) = _garageService.PrepareElectricCar(request);
+            _listProcessorService.AddVehicleRequestsToMatchingList(chargeRequest, airRequest);
+            return Ok("Electric car added successfully");
         }
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
-        
-        var car = _garageService.CreateElectricCar(request);
-        var chargeRequest = _garageService.CreateChargeRequest(car, request.HoursToCharge);
-        var airRequest = _garageService.CreateAirRequest(car, request.DesiredWheelPressures);
-        _garageService.AddVehicleToGarage(car);
-        _listProcessorService.AddVehicleRequestsToMatchingList(chargeRequest, airRequest);
-        
-        return Ok("Electric car added successfully");
     }
 
     [HttpPost("AddFuelCar")]
@@ -81,18 +76,13 @@ public class GarageController : ControllerBase
         try
         {
             await _garageService.CheckValidFuelCarInput(request);
+            var (fuelRequest, airRequest) = _garageService.PrepareFuelCar(request);
+            _listProcessorService.AddVehicleRequestsToMatchingList(fuelRequest, airRequest);
+            return Ok("Fuel car added successfully");
         }
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
-        
-        var car = _garageService.CreateFuelCar(request);
-        var fuelRequest = _garageService.CreateFuelRequest(car, request.LitersToFuel);
-        var airRequest = _garageService.CreateAirRequest(car, request.DesiredWheelPressures);
-        _garageService.AddVehicleToGarage(car);
-        _listProcessorService.AddVehicleRequestsToMatchingList(fuelRequest, airRequest);
-        
-        return Ok("Fuel car added successfully");
     }
 }

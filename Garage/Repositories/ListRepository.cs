@@ -9,22 +9,23 @@ public class ListRepository : IListRepository
 {
     public void AddVehicleRequestToMatchingList(TreatmentRequest firstRequest, TreatmentRequest secondRequest)
     {
-        foreach (var treatmentType in firstRequest.Vehicle.TreatmentTypes)
+        AddToMatchingList(firstRequest);
+        AddToMatchingList(secondRequest);
+    }
+    
+    public void AddToMatchingList(TreatmentRequest request)
+    {
+        TreatmentType treatmentType = request switch
         {
-            if (InMemoryDatabase.TreatmentLists.ContainsKey(treatmentType))
-            {
-                var list = InMemoryDatabase.TreatmentLists[treatmentType];
-                list.AddLast(firstRequest);
-            }
-        }
+            FuelRequest => TreatmentType.Refuel,
+            ChargeRequest => TreatmentType.Recharge,
+            AirRequest => TreatmentType.Inflate,
+            _ => throw new ArgumentException("Unsupported request type")
+        };
 
-        foreach (var treatmentType in secondRequest.Vehicle.TreatmentTypes)
+        if (InMemoryDatabase.TreatmentLists.TryGetValue(treatmentType, out var list))
         {
-            if (InMemoryDatabase.TreatmentLists.ContainsKey(treatmentType))
-            {
-                var list = InMemoryDatabase.TreatmentLists[treatmentType];
-                list.AddLast(secondRequest);
-            }
+            list.AddLast(request);
         }
     }
 

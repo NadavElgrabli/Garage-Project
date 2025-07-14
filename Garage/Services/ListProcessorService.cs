@@ -48,7 +48,6 @@ public class ListProcessorService
 
                 if (request == null || !_listRepository.RemoveRequest(treatmentService, request))
                 {
-                    // Nothing to process right now
                     goto WaitAndRetry;
                 }
             }
