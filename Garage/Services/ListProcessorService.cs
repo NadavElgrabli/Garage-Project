@@ -62,7 +62,8 @@ public class ListProcessorService
             {
                 Console.WriteLine($"Treatment error: {ex.Message}");
             }
-
+            
+            // await Task.Delay(100) gives the thread a chance to pause and reduce CPU usage
             WaitAndRetry:
             await Task.Delay(100);
         }

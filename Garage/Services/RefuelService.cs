@@ -45,9 +45,6 @@ public class RefuelService : ITreatmentService
         }
     }
 
-    public bool IsMatch(Vehicle vehicle) =>
-        vehicle.TreatmentTypes.Contains(TreatmentType.Refuel);
-
     public TreatmentType GetTreatmentType()
     {
         return TreatmentType.Refuel;

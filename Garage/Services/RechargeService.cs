@@ -48,9 +48,6 @@ public class RechargeService : ITreatmentService
         }
     }
 
-    public bool IsMatch(Vehicle vehicle) =>
-        vehicle.TreatmentTypes.Contains(TreatmentType.Recharge);
-
     public TreatmentType GetTreatmentType()
     {
         return TreatmentType.Recharge;

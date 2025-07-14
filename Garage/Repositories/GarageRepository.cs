@@ -29,7 +29,7 @@ public class GarageRepository : IGarageRepository
 
         if (request.Wheels.Count != request.DesiredWheelPressures.Count)
         {
-            throw new InvalidOperationException("Number of wheels does not match");
+            throw new InvalidOperationException($"Number of wheels: {request.Wheels.Count} does not match the number of desired wheel pressures: {request.DesiredWheelPressures.Count}");
         }
 
         if (request.TreatmentTypes.Count is > 2 or < 1)

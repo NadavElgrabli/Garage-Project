@@ -52,9 +52,6 @@ public class InflateService : ITreatmentService
         }
     }
 
-    public bool IsMatch(Vehicle vehicle) =>
-        vehicle.TreatmentTypes.Contains(TreatmentType.Inflate);
-
     public TreatmentType GetTreatmentType()
     {
         return TreatmentType.Inflate;
