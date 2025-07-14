@@ -21,8 +21,8 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // i added
-var queueProcessor = app.Services.GetRequiredService<ListProcessorService>();
-_ = queueProcessor.StartProcessingAsync(); 
+var listProcessor = app.Services.GetRequiredService<ListProcessorService>();
+_ = listProcessor.StartProcessingAsync(); 
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
