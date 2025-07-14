@@ -8,12 +8,13 @@ public class InMemoryDatabase
 {
     public static Dictionary<string, Vehicle> Vehicles { get; set; } = new();
     
-    public static Dictionary<TreatmentType, ConcurrentQueue<TreatmentRequest>> TreatmentQueues { get; } =
+    public static Dictionary<TreatmentType, LinkedList<TreatmentRequest>> TreatmentLists { get; } =
         Enum.GetValues(typeof(TreatmentType))
             .Cast<TreatmentType>()
             .ToDictionary(
                 type => type,
-                type => new ConcurrentQueue<TreatmentRequest>()
+                type => new LinkedList<TreatmentRequest>()
             );
+
 
 }

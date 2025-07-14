@@ -10,8 +10,8 @@ builder.Services.AddSingleton<ITreatmentService, RechargeService>();
 builder.Services.AddSingleton<ITreatmentService, InflateService>();
 builder.Services.AddSingleton<GarageService>();
 builder.Services.AddSingleton<IGarageRepository, GarageRepository>();
-builder.Services.AddSingleton<IQueueRepository, QueueRepository>();
-builder.Services.AddSingleton<QueueProcessorService>();
+builder.Services.AddSingleton<IListRepository, ListRepository>();
+builder.Services.AddSingleton<ListProcessorService>();
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -21,7 +21,7 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // i added
-var queueProcessor = app.Services.GetRequiredService<QueueProcessorService>();
+var queueProcessor = app.Services.GetRequiredService<ListProcessorService>();
 _ = queueProcessor.StartProcessingAsync(); 
 
 // Configure the HTTP request pipeline.
