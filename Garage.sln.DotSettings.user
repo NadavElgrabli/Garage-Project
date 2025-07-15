@@ -4,5 +4,6 @@
   &lt;Or&gt;&#xD;
     &lt;ProjectFile&gt;EA28190E-132C-48AE-AE09-8B55E2130711/d:Services/f:RechargeServiceTests.cs&lt;/ProjectFile&gt;&#xD;
     &lt;ProjectFile&gt;EA28190E-132C-48AE-AE09-8B55E2130711/d:Services/f:RefuelServiceTests.cs&lt;/ProjectFile&gt;&#xD;
+    &lt;ProjectFile&gt;EA28190E-132C-48AE-AE09-8B55E2130711/d:Services/f:InflateServiceTests.cs&lt;/ProjectFile&gt;&#xD;
   &lt;/Or&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

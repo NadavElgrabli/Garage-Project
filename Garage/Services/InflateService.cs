@@ -24,17 +24,20 @@ public class InflateService : ITreatmentService
             for (int i = 0; i < vehicle.Wheels.Count; i++)
             {
                 var wheel = vehicle.Wheels[i];
-                float target = desiredPressures[i];
-                float pressureToAdd = MathF.Max(0, target - wheel.CurrentPressure);
-                await Task.Delay((int)pressureToAdd * 500);
+                float target = desiredPressures[i]; // target is 10, current is 2, max is 8
 
+                // Wheel exploded from over pressure, e.g: target is 10, current is 2, max pressure is 8
                 if (target > wheel.MaxPressure)
                 {
+                    await Task.Delay((int)(wheel.MaxPressure - wheel.CurrentPressure) * 500);
                     wheel.CurrentPressure = 0;
                     totalPrice += 350;
                 }
+                //current pressure is 2, max pressure is 8, target is 8 or lower
                 else
                 {
+                    float pressureToAdd = MathF.Max(0, target - wheel.CurrentPressure);
+                    await Task.Delay((int)pressureToAdd * 500);
                     wheel.CurrentPressure += pressureToAdd;
                     totalPrice += pressureToAdd * 0.1f;
                 }
