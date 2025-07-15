@@ -20,67 +20,6 @@ public class GarageRepository : IGarageRepository
         return null;
     }
 
-    public Task CheckValidElectricCarInput(AddElectricCarRequest request)
-    {
-        if (InMemoryDatabase.Vehicles.ContainsKey(request.LicensePlate))
-        {
-            throw new InvalidOperationException("Car already in garage");
-        }
-
-        if (request.Wheels.Count != request.DesiredWheelPressures.Count)
-        {
-            throw new InvalidOperationException($"Number of wheels: {request.Wheels.Count} does not match the number of desired wheel pressures: {request.DesiredWheelPressures.Count}");
-        }
-
-        if (request.TreatmentTypes.Count is > 2 or < 1)
-        {
-            throw new InvalidOperationException("Number of treatments must be between 1 or 2");
-        }
-        
-        if (request.Engine.CurrentEnergy > request.Engine.MaxEnergy)
-        {
-            throw new InvalidOperationException("Engine has too much electricity");
-        }
-        
-        if (request.TreatmentTypes.Contains(TreatmentType.Refuel))
-        {
-            throw new InvalidOperationException("Cannot have a refuel treatment for an electric car");
-        }
-        
-        return Task.CompletedTask;
-    }
-    
-    
-    public Task CheckValidFuelCarInput(AddFuelCarRequest request)
-    {
-        if (InMemoryDatabase.Vehicles.ContainsKey(request.LicensePlate))
-        {
-            throw new InvalidOperationException("Car already in garage");
-        }
-
-        if (request.Wheels.Count != request.DesiredWheelPressures.Count)
-        {
-            throw new InvalidOperationException("Number of wheels does not match");
-        }
-
-        if (request.TreatmentTypes.Count is > 2 or < 1)
-        {
-            throw new InvalidOperationException("Number of treatments must be between 1 and 2");
-        }
-
-        if (request.Engine.CurrentEnergy > request.Engine.MaxEnergy)
-        {
-            throw new InvalidOperationException("Engine has too much fuel");
-        }
-
-        if (request.TreatmentTypes.Contains(TreatmentType.Recharge))
-        {
-            throw new InvalidOperationException("Cannot have a recharge treatment for a car that runs on fuel");
-        }
-        
-        return Task.CompletedTask;
-    }
-
     public List<VehicleInfo> DisplayVehiclesByStatus(Status status)
     {
      return InMemoryDatabase.Vehicles.Where(pair => pair.Value.Status == status).Select(pair => new VehicleInfo

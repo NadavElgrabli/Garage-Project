@@ -13,16 +13,6 @@ public class GarageService
         _garageRepository = garageRepository;
     }
 
-    public Task CheckValidElectricCarInput(AddElectricCarRequest request)
-    {
-        return _garageRepository.CheckValidElectricCarInput(request);
-    }
-    
-    public Task CheckValidFuelCarInput(AddFuelCarRequest request)
-    {
-        return _garageRepository.CheckValidFuelCarInput(request);
-    }
-
     public void AddVehicleToGarage(Vehicle vehicle)
     {
         _garageRepository.AddVehicleToGarage(vehicle);

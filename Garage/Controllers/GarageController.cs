@@ -1,6 +1,7 @@
 ﻿using Garage.Data;
 using Garage.Enums;
 using Garage.Models;
+using Garage.Repositories;
 using Garage.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,11 +13,13 @@ public class GarageController : ControllerBase
 {
     private readonly GarageService _garageService;
     private readonly ListProcessorService _listProcessorService;
+    private readonly IValidationRepository _validationRepository;
 
-    public GarageController(GarageService garageService,  ListProcessorService listProcessorService)
+    public GarageController(GarageService garageService,  ListProcessorService listProcessorService,  IValidationRepository validationRepository)
     {
         _garageService = garageService;
         _listProcessorService = listProcessorService;
+        _validationRepository = validationRepository;
     }
 
     [HttpPost("InitializeGarage")]
@@ -59,7 +62,7 @@ public class GarageController : ControllerBase
     {
         try
         {
-            await _garageService.CheckValidElectricCarInput(request);
+            await _validationRepository.CheckValidElectricCarInput(request);
             var (chargeRequest, airRequest) = _garageService.PrepareElectricCar(request);
             _listProcessorService.AddVehicleRequestsToMatchingList(chargeRequest, airRequest);
             return Ok("Electric car added successfully");
@@ -75,7 +78,7 @@ public class GarageController : ControllerBase
     {
         try
         {
-            await _garageService.CheckValidFuelCarInput(request);
+            await _validationRepository.CheckValidFuelCarInput(request);
             var (fuelRequest, airRequest) = _garageService.PrepareFuelCar(request);
             _listProcessorService.AddVehicleRequestsToMatchingList(fuelRequest, airRequest);
             return Ok("Fuel car added successfully");
