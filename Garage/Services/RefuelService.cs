@@ -18,21 +18,29 @@ public class RefuelService : ITreatmentService
 
         try
         {
-            vehicle.Status = Status.InTreatment;
-
             if (vehicle.Engine.CurrentEnergy == vehicle.Engine.MaxEnergy)
                 throw new Exception("Engine fully fueled already");
-
+            
+            vehicle.Status = Status.InTreatment;
             float missingFuelAmount = vehicle.Engine.MaxEnergy - vehicle.Engine.CurrentEnergy;
-            float totalPrice = missingFuelAmount * 5;
-            int milliseconds = (int)missingFuelAmount * 250;
-
-            await Task.Delay(milliseconds);
-
+            float totalPrice = litersToFuel * 5;
+            
+            // Overflow of fuel
             if (vehicle.Engine.CurrentEnergy + litersToFuel > vehicle.Engine.MaxEnergy)
+            {
+                totalPrice = missingFuelAmount * 5;
                 totalPrice += 25; // Made a mess, spilled fuel, cost to clean is
-
-            vehicle.Engine.CurrentEnergy = vehicle.Engine.MaxEnergy;
+                // We will wait the amount of time it takes to fill up the missingFuelAmount
+                int timeToFullyRefuel = (int)(missingFuelAmount) * 250;
+                await Task.Delay(timeToFullyRefuel);
+                vehicle.Engine.CurrentEnergy = vehicle.Engine.MaxEnergy;
+            }
+            else
+            {
+                int milliseconds = (int)litersToFuel * 250;
+                vehicle.Engine.CurrentEnergy += litersToFuel;
+                await Task.Delay(milliseconds);
+            }
             vehicle.TreatmentsPrice = totalPrice;
             vehicle.TreatmentTypes.Remove(TreatmentType.Refuel);
             vehicle.Status = vehicle.TreatmentTypes.Count == 0 ? Status.Ready : Status.Pending;

@@ -18,15 +18,12 @@ public class RechargeService : ITreatmentService
 
         try
         {
-            vehicle.Status = Status.InTreatment;
-            float energyToFullCharge = vehicle.Engine.MaxEnergy - vehicle.Engine.CurrentEnergy;
-
-
             if (vehicle.Engine.CurrentEnergy == vehicle.Engine.MaxEnergy)
                 throw new Exception("Engine fully charged already");
-
+            
+            vehicle.Status = Status.InTreatment;
+            float energyToFullCharge = vehicle.Engine.MaxEnergy - vehicle.Engine.CurrentEnergy;
             float totalPrice = hoursToCharge * 10;
-            int milliseconds = (int)(hoursToCharge * 10000);
             
             // Overflow of charge (for example current energy was 2, max energy is 5, but requested to charge 10 hours)
             if (hoursToCharge > energyToFullCharge)
@@ -36,8 +33,8 @@ public class RechargeService : ITreatmentService
                 // penalty for overcharge
                 totalPrice += 1500;
                 // we will wait the time to fully charge 3 hours (until max energy which is 5)
-                int maximumWaitTime = (int)(energyToFullCharge) * (10000);
-                await Task.Delay(maximumWaitTime);
+                int timeToFullyCharge = (int)(energyToFullCharge) * (10000);
+                await Task.Delay(timeToFullyCharge);
                 var random = new Random();
                 // the current energy will be random between the current energy and max energy because the engine is overflowed and messed up
                 float min = vehicle.Engine.CurrentEnergy;
@@ -45,8 +42,10 @@ public class RechargeService : ITreatmentService
 
                 vehicle.Engine.CurrentEnergy = (float)(random.NextDouble() * (max - min) + min);
             }
+            // We recharge it to the maximum or less
             else
             {
+                int milliseconds = (int)(hoursToCharge * 10000);
                 vehicle.Engine.CurrentEnergy += hoursToCharge;
                 await Task.Delay(milliseconds);
             }

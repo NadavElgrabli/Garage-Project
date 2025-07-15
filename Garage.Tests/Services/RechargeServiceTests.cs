@@ -46,7 +46,7 @@ public class RechargeServiceTests
     
     
     [Fact]
-    public async Task TreatAsync_ShouldOverchargeVehicle()
+    public async Task TreatAsync_ShouldOverChargeVehicle()
     {
         // Arrange
         var vehicle = new Car
