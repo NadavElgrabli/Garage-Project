@@ -6,7 +6,7 @@ namespace Garage.Services;
 
 public class InflateService : ITreatmentService
 {
-    public async Task<float> TreatAsync(Vehicle vehicle, TreatmentRequest request)
+    public async Task TreatAsync(Vehicle vehicle, TreatmentRequest request)
     {
         if (request is not AirRequest airRequest)
             throw new ArgumentException("Invalid data type. Expected AirRequest.");
@@ -40,10 +40,10 @@ public class InflateService : ITreatmentService
                 }
             }
 
+            vehicle.TreatmentsPrice = totalPrice;
             vehicle.TreatmentTypes.Remove(TreatmentType.Inflate);
             vehicle.Status = vehicle.TreatmentTypes.Count == 0 ? Status.Ready : Status.Pending;
 
-            return totalPrice;
         }
         finally
         {

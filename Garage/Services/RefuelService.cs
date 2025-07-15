@@ -6,7 +6,7 @@ namespace Garage.Services;
 
 public class RefuelService : ITreatmentService
 {
-    public async Task<float> TreatAsync(Vehicle vehicle, TreatmentRequest request)
+    public async Task TreatAsync(Vehicle vehicle, TreatmentRequest request)
     {
         if (request is not FuelRequest fuelRequest)
             throw new ArgumentException("Invalid data type. Expected FuelRequest.");
@@ -33,10 +33,10 @@ public class RefuelService : ITreatmentService
                 totalPrice += 25; // Made a mess, spilled fuel, cost to clean is
 
             vehicle.Engine.CurrentEnergy = vehicle.Engine.MaxEnergy;
+            vehicle.TreatmentsPrice = totalPrice;
             vehicle.TreatmentTypes.Remove(TreatmentType.Refuel);
             vehicle.Status = vehicle.TreatmentTypes.Count == 0 ? Status.Ready : Status.Pending;
 
-            return totalPrice;
         }
         finally
         {

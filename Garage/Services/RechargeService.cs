@@ -6,7 +6,7 @@ namespace Garage.Services;
 
 public class RechargeService : ITreatmentService
 {
-    public async Task<float> TreatAsync(Vehicle vehicle, TreatmentRequest request)
+    public async Task TreatAsync(Vehicle vehicle, TreatmentRequest request)
     {
         if (request is not ChargeRequest chargeRequest)
             throw new ArgumentException("Invalid data type. Expected ChargeRequest.");
@@ -46,7 +46,6 @@ public class RechargeService : ITreatmentService
             vehicle.TreatmentTypes.Remove(TreatmentType.Recharge);
             vehicle.Status = vehicle.TreatmentTypes.Count == 0 ? Status.Ready : Status.Pending;
 
-            return totalPrice;
         }
         finally
         {

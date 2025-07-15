@@ -35,10 +35,10 @@ public class RechargeServiceTests
         GarageState.WorkersSemaphore = new SemaphoreSlim(1);
 
         // Act
-        float price = await service.TreatAsync(vehicle, request);
+        await service.TreatAsync(vehicle, request);
 
         // Assert
-        Assert.Equal(50, price); // 5 hours * 10
+        Assert.Equal(50, vehicle.TreatmentsPrice); // 5 hours * 10
         Assert.Equal(vehicle.Engine.MaxEnergy, vehicle.Engine.CurrentEnergy);
         Assert.DoesNotContain(TreatmentType.Recharge, vehicle.TreatmentTypes);
         Assert.Equal(Status.Ready, vehicle.Status);

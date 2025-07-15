@@ -55,8 +55,7 @@ public class ListProcessorService
             // Outside the lock and free to treat in parallel
             try
             {
-                float price = await treatmentService.TreatAsync(request.Vehicle, request);
-                request.Vehicle.TreatmentsPrice += price;
+                await treatmentService.TreatAsync(request.Vehicle, request);
             }
             catch (Exception ex)
             {

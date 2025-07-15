@@ -5,6 +5,6 @@ namespace Garage.Services;
 
 public interface ITreatmentService
 {
-    Task<float> TreatAsync(Vehicle vehicle, TreatmentRequest request);
+    Task TreatAsync(Vehicle vehicle, TreatmentRequest request);
     TreatmentType GetTreatmentType();
 }
