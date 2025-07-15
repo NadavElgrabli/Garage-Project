@@ -19,6 +19,8 @@ public class RechargeService : ITreatmentService
         try
         {
             vehicle.Status = Status.InTreatment;
+            float energyToFullCharge = vehicle.Engine.MaxEnergy - vehicle.Engine.CurrentEnergy;
+
 
             if (vehicle.Engine.CurrentEnergy == vehicle.Engine.MaxEnergy)
                 throw new Exception("Engine fully charged already");
@@ -26,15 +28,22 @@ public class RechargeService : ITreatmentService
             float totalPrice = hoursToCharge * 10;
             int milliseconds = (int)(hoursToCharge * 10000);
             
-            // Overflow of charge
-            if (hoursToCharge > vehicle.Engine.MaxEnergy - vehicle.Engine.CurrentEnergy)
+            // Overflow of charge (for example current energy was 2, max energy is 5, but requested to charge 10 hours)
+            if (hoursToCharge > energyToFullCharge)
             {
+                // total price will be of 3 hours
+                totalPrice = (energyToFullCharge) * 10;
+                // penalty for overcharge
                 totalPrice += 1500;
+                // we will wait the time to fully charge 3 hours (until max energy which is 5)
+                int maximumWaitTime = (int)(energyToFullCharge) * (10000);
+                await Task.Delay(maximumWaitTime);
                 var random = new Random();
-                vehicle.Engine.CurrentEnergy = (float)random.NextDouble() * (vehicle.Engine.MaxEnergy - 1) + 1;
-                int randomDelay = random.Next(0, milliseconds + 1);
-                await Task.Delay(randomDelay);
+                // the current energy will be random between the current energy and max energy because the engine is overflowed and messed up
+                float min = vehicle.Engine.CurrentEnergy;
+                float max = vehicle.Engine.MaxEnergy;
 
+                vehicle.Engine.CurrentEnergy = (float)(random.NextDouble() * (max - min) + min);
             }
             else
             {
