@@ -45,11 +45,14 @@ public class ListProcessorService
             lock (InMemoryDatabase.TreatmentLocks[treatmentType])
             {
                 request = _listRepository.FindFirstAvailableVehicleRequest(treatmentService);
-
-                if (request == null || !_listRepository.RemoveRequest(treatmentService, request))
-                {
+                
+                // Only continue if request is found and removed
+                if (request == null)
                     goto WaitAndRetry;
-                }
+
+                bool removed = _listRepository.RemoveRequest(treatmentService, request);
+                if (!removed)
+                    goto WaitAndRetry;
             }
 
             // Outside the lock and free to treat in parallel
