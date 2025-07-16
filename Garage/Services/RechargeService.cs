@@ -18,15 +18,12 @@ public class RechargeService : ITreatmentService
 
         try
         {
-            if (vehicle.Engine.CurrentEnergy == vehicle.Engine.MaxEnergy)
-                throw new Exception("Engine fully charged already");
-            
             vehicle.Status = Status.InTreatment;
             float energyToFullCharge = vehicle.Engine.MaxEnergy - vehicle.Engine.CurrentEnergy;
             float totalPrice = hoursToCharge * 10;
             
             // Overflow of charge (for example current energy was 2, max energy is 5, but requested to charge 10 hours)
-            if (hoursToCharge > energyToFullCharge)
+            if (vehicle.Engine.CurrentEnergy + hoursToCharge > vehicle.Engine.MaxEnergy)
             {
                 // total price will be of 3 hours
                 totalPrice = (energyToFullCharge) * 10;

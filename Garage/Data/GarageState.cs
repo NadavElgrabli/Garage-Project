@@ -6,6 +6,8 @@ public class GarageState
     public static SemaphoreSlim FuelStationsRequestsSemaphore;
     public static SemaphoreSlim AirStationsRequestsSemaphore;
     public static SemaphoreSlim ChargeStationsRequestsSemaphore;
+    public static bool IsInitialized { get; private set; } = false;
+
 
     public static void Initialize(int workers, int fuelStations, int airStations, int chargeStations)
     {
@@ -13,5 +15,6 @@ public class GarageState
         FuelStationsRequestsSemaphore = new SemaphoreSlim(fuelStations, fuelStations);
         AirStationsRequestsSemaphore = new SemaphoreSlim(airStations, airStations);
         ChargeStationsRequestsSemaphore = new SemaphoreSlim(chargeStations, chargeStations);
+        IsInitialized = true;
     }
 }

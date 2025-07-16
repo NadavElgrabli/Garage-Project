@@ -59,6 +59,8 @@ public class GarageController : ControllerBase
     [HttpPost("AddElectricCar")]
     public async Task<IActionResult> AddElectricCar([FromBody] AddElectricCarRequest request)
     {
+        if (!GarageState.IsInitialized)
+            return BadRequest("Garage must be initialized before adding vehicles.");
         try
         {
             await _validationService.CheckValidElectricCarInput(request);
@@ -75,6 +77,8 @@ public class GarageController : ControllerBase
     [HttpPost("AddFuelCar")]
     public async Task<IActionResult> AddFuelCar([FromBody] AddFuelCarRequest request)
     {
+        if (!GarageState.IsInitialized)
+            return BadRequest("Garage must be initialized before adding vehicles.");
         try
         {
             await _validationService.CheckValidFuelCarInput(request);

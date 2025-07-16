@@ -18,9 +18,6 @@ public class RefuelService : ITreatmentService
 
         try
         {
-            if (vehicle.Engine.CurrentEnergy == vehicle.Engine.MaxEnergy)
-                throw new Exception("Engine fully fueled already");
-            
             vehicle.Status = Status.InTreatment;
             float missingFuelAmount = vehicle.Engine.MaxEnergy - vehicle.Engine.CurrentEnergy;
             float totalPrice = litersToFuel * 5;
