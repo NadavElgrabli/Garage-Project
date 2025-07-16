@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Garage.Middlewares;
 using Garage.Repositories;
 using Garage.Services;
 

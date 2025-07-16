@@ -10,6 +10,11 @@ public class GarageRepository : IGarageRepository
     {
         InMemoryDatabase.Vehicles.Add(vehicle.LicensePlate, vehicle);
     }
+
+    public void RemoveVehicleFromGarage(Vehicle vehicle)
+    {
+        InMemoryDatabase.Vehicles.Remove(vehicle.LicensePlate);
+    }
     
     public Vehicle? GetVehicleByLicensePlate(string licensePlate)
     {

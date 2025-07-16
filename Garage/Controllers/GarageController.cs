@@ -1,5 +1,4 @@
-﻿using Garage.Data;
-using Garage.Enums;
+﻿using Garage.Enums;
 using Garage.Models;
 using Garage.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -24,19 +23,10 @@ public class GarageController : ControllerBase
     [HttpPost("InitializeGarage")]
     public IActionResult InitializeGarage([FromBody] GarageInit init)
     {
-        if (init.Workers <= 0 || init.FuelStations <= 0 || init.AirStations <= 0 || init.ChargingStations <= 0)
-        {
-            return BadRequest("All values must be positive");
-        }
-        
-        GarageState.Initialize(
-            init.Workers,
-            init.FuelStations,
-            init.AirStations,
-            init.ChargingStations);
-        
+        _garageService.InitializeGarage(init);
         return Ok("Garage initialized successfully");
     }
+
 
     [HttpPost("GetVehiclesByStatus")]
     public IActionResult GetVehiclesByStatus([FromQuery] Status status)
@@ -44,51 +34,42 @@ public class GarageController : ControllerBase
         var vehicles = _garageService.DisplayVehiclesByStatus(status);
         return Ok(vehicles);
     }
-
+    
     [HttpPost("GetVehicleByLicensePlate")]
     public IActionResult GetVehicleByLicensePlate([FromQuery] string licensePlate)
     {
-        var v = _garageService.GetVehicleByLicensePlate(licensePlate);
-        if (v == null)
-        {
-            return NotFound("Vehicle not found");
-        }
-        return Ok(v);
+        var vehicle = _garageService.GetVehicleByLicensePlateOrThrow(licensePlate);
+        return Ok(vehicle);
     }
 
+    
+    [HttpPost("PickUpVehicleFromGarage")]
+    public IActionResult PickUpVehicleFromGarage([FromQuery] string licensePlate)
+    {
+        var vehicle = _garageService.PickUpVehicle(licensePlate);
+        return Ok(vehicle);
+    }
+    
     [HttpPost("AddElectricCar")]
     public async Task<IActionResult> AddElectricCar([FromBody] AddElectricCarRequest request)
     {
-        if (!GarageState.IsInitialized)
-            return BadRequest("Garage must be initialized before adding vehicles.");
-        try
-        {
-            await _validationService.CheckValidElectricCarInput(request);
-            var (chargeRequest, airRequest) = _garageService.PrepareElectricCar(request);
-            _listProcessorService.AddVehicleRequestsToMatchingList(chargeRequest, airRequest);
-            return Ok("Electric car added successfully");
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        await _validationService.CheckValidElectricCarInput(request);
+
+        var (chargeRequest, airRequest) = _garageService.PrepareElectricCar(request);
+        _listProcessorService.AddVehicleRequestsToMatchingList(chargeRequest, airRequest);
+
+        return Ok("Electric car added successfully");
     }
 
     [HttpPost("AddFuelCar")]
     public async Task<IActionResult> AddFuelCar([FromBody] AddFuelCarRequest request)
     {
-        if (!GarageState.IsInitialized)
-            return BadRequest("Garage must be initialized before adding vehicles.");
-        try
-        {
-            await _validationService.CheckValidFuelCarInput(request);
-            var (fuelRequest, airRequest) = _garageService.PrepareFuelCar(request);
-            _listProcessorService.AddVehicleRequestsToMatchingList(fuelRequest, airRequest);
-            return Ok("Fuel car added successfully");
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        await _validationService.CheckValidFuelCarInput(request);
+
+        var (fuelRequest, airRequest) = _garageService.PrepareFuelCar(request);
+        _listProcessorService.AddVehicleRequestsToMatchingList(fuelRequest, airRequest);
+
+        return Ok("Fuel car added successfully");
     }
+
 }

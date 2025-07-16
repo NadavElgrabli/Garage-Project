@@ -9,6 +9,9 @@ public class ValidationRepository : IValidationRepository
     
     public Task CheckValidElectricCarInput(AddElectricCarRequest request)
     {
+        if (!GarageState.IsInitialized)
+            throw new InvalidOperationException("Garage must be initialized before adding vehicles.");
+        
         if (InMemoryDatabase.Vehicles.ContainsKey(request.LicensePlate))
         {
             throw new InvalidOperationException("Car already in garage");
@@ -48,6 +51,9 @@ public class ValidationRepository : IValidationRepository
     
     public Task CheckValidFuelCarInput(AddFuelCarRequest request)
     {
+        if (!GarageState.IsInitialized)
+            throw new InvalidOperationException("Garage must be initialized before adding vehicles.");
+
         if (InMemoryDatabase.Vehicles.ContainsKey(request.LicensePlate))
         {
             throw new InvalidOperationException("Car already in garage");

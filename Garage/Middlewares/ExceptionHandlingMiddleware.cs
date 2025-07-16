@@ -1,4 +1,6 @@
-﻿public class ExceptionHandlingMiddleware
+﻿namespace Garage.Middlewares;
+
+public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionHandlingMiddleware> _logger;
@@ -25,6 +27,7 @@
             {
                 ArgumentException => StatusCodes.Status400BadRequest,
                 InvalidOperationException => StatusCodes.Status422UnprocessableEntity,
+                KeyNotFoundException => StatusCodes.Status404NotFound,
                 _ => StatusCodes.Status500InternalServerError
             };
 

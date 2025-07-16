@@ -1,4 +1,5 @@
-﻿using Garage.Enums;
+﻿using Garage.Data;
+using Garage.Enums;
 using Garage.Models;
 using Garage.Repositories;
 
@@ -12,16 +13,63 @@ public class GarageService
     {
         _garageRepository = garageRepository;
     }
+    
+    public void InitializeGarage(GarageInit init)
+    {
+        if (init.Workers <= 0 || init.FuelStations <= 0 || init.AirStations <= 0 || init.ChargingStations <= 0)
+        {
+            throw new ArgumentException("All values must be positive");
+        }
+    
+        GarageState.Initialize(
+            init.Workers,
+            init.FuelStations,
+            init.AirStations,
+            init.ChargingStations);
+    }
+
 
     public void AddVehicleToGarage(Vehicle vehicle)
     {
         _garageRepository.AddVehicleToGarage(vehicle);
     }
+
+    public void RemoveVehicleFromGarage(Vehicle vehicle)
+    {
+        _garageRepository.RemoveVehicleFromGarage(vehicle);
+    }
+    
+    public Vehicle PickUpVehicle(string licensePlate)
+    {
+        var vehicle = GetVehicleByLicensePlate(licensePlate);
+
+        if (vehicle == null)
+            throw new KeyNotFoundException($"Vehicle with license plate {licensePlate} is not in the garage.");
+
+        if (vehicle.Status != Status.Ready)
+            throw new InvalidOperationException($"Vehicle with license plate {licensePlate} is not ready for pickup. Current status: {vehicle.Status}");
+
+        RemoveVehicleFromGarage(vehicle);
+
+        return vehicle;
+    }
+
     
     public Vehicle? GetVehicleByLicensePlate(string licensePlate)
     {
         return _garageRepository.GetVehicleByLicensePlate(licensePlate);
     }
+    
+    public Vehicle GetVehicleByLicensePlateOrThrow(string licensePlate)
+    {
+        var vehicle = _garageRepository.GetVehicleByLicensePlate(licensePlate);
+
+        if (vehicle == null)
+            throw new KeyNotFoundException("Vehicle not found");
+
+        return vehicle;
+    }
+
     
     public Car CreateElectricCar(AddElectricCarRequest request)
     {
