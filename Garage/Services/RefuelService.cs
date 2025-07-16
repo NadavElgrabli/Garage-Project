@@ -38,7 +38,7 @@ public class RefuelService : ITreatmentService
                 vehicle.Engine.CurrentEnergy += litersToFuel;
                 await Task.Delay(milliseconds);
             }
-            vehicle.TreatmentsPrice = totalPrice;
+            vehicle.TreatmentsPrice += totalPrice;
             vehicle.TreatmentTypes.Remove(TreatmentType.Refuel);
             vehicle.Status = vehicle.TreatmentTypes.Count == 0 ? Status.Ready : Status.Pending;
 

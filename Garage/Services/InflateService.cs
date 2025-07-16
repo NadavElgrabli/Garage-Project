@@ -43,7 +43,7 @@ public class InflateService : ITreatmentService
                 }
             }
 
-            vehicle.TreatmentsPrice = totalPrice;
+            vehicle.TreatmentsPrice += totalPrice;
             vehicle.TreatmentTypes.Remove(TreatmentType.Inflate);
             vehicle.Status = vehicle.TreatmentTypes.Count == 0 ? Status.Ready : Status.Pending;
 

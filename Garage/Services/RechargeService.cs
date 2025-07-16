@@ -47,7 +47,7 @@ public class RechargeService : ITreatmentService
                 await Task.Delay(milliseconds);
             }
             
-            vehicle.TreatmentsPrice = totalPrice;
+            vehicle.TreatmentsPrice += totalPrice;
             vehicle.TreatmentTypes.Remove(TreatmentType.Recharge);
             vehicle.Status = vehicle.TreatmentTypes.Count == 0 ? Status.Ready : Status.Pending;
 
