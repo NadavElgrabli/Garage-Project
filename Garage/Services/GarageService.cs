@@ -159,6 +159,8 @@ public class GarageService
     public List<TreatmentRequest> PrepareElectricCar(AddElectricCarRequest request)
     {
         var car = CreateElectricCar(request);
+        AddVehicleToGarage(car);
+
         var treatmentRequests = new List<TreatmentRequest>();
         if (car.TreatmentTypes.Contains(TreatmentType.Recharge))
         {
@@ -170,7 +172,6 @@ public class GarageService
             var airRequest = CreateAirRequest(car, request.DesiredWheelPressures);
             treatmentRequests.Add(airRequest);
         }
-        AddVehicleToGarage(car);
 
         return treatmentRequests;
     }
@@ -179,6 +180,8 @@ public class GarageService
     public List<TreatmentRequest> PrepareFuelCar(AddFuelCarRequest request)
     {
         var car = CreateFuelCar(request);
+        AddVehicleToGarage(car);
+
         var treatmentRequests = new List<TreatmentRequest>();
         if (car.TreatmentTypes.Contains(TreatmentType.Refuel))
         {
@@ -190,11 +193,8 @@ public class GarageService
             var airRequest = CreateAirRequest(car, request.DesiredWheelPressures);
             treatmentRequests.Add(airRequest);
         }
-        AddVehicleToGarage(car);
         return treatmentRequests;
 
     }
-
-    
     
 }

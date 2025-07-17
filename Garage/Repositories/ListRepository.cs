@@ -7,35 +7,6 @@ namespace Garage.Repositories;
 
 public class ListRepository : IListRepository
 {
-    // used to be:
-    // public void AddVehicleRequestToMatchingList(TreatmentRequest firstRequest, TreatmentRequest secondRequest)
-    // {
-    //     AddToMatchingList(firstRequest);
-    //     AddToMatchingList(secondRequest);
-    // }
-    
-    // public void AddVehicleRequestToMatchingList(List<TreatmentRequest> treatmentRequests)
-    // {
-    //     AddToMatchingList(firstRequest);
-    //     AddToMatchingList(secondRequest);
-    // }
-    //
-    // public void AddToMatchingList(TreatmentRequest request)
-    // {
-    //     TreatmentType treatmentType = request switch
-    //     {
-    //         FuelRequest => TreatmentType.Refuel,
-    //         ChargeRequest => TreatmentType.Recharge,
-    //         AirRequest => TreatmentType.Inflate,
-    //         _ => throw new ArgumentException("Unsupported request type")
-    //     };
-    //
-    //     if (InMemoryDatabase.TreatmentLists.TryGetValue(treatmentType, out var list))
-    //     {
-    //         list.AddLast(request);
-    //     }
-    // }
-    
     public void AddVehicleRequestToMatchingList(List<TreatmentRequest> treatmentRequests)
     {
         foreach (var request in treatmentRequests)
