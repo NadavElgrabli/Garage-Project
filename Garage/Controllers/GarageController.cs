@@ -54,20 +54,21 @@ public class GarageController : ControllerBase
     public async Task<IActionResult> AddElectricCar([FromBody] AddElectricCarRequest request)
     {
         await _validationService.CheckValidElectricCarInput(request);
-
-        var (chargeRequest, airRequest) = _garageService.PrepareElectricCar(request);
-        _listProcessorService.AddVehicleRequestsToMatchingList(chargeRequest, airRequest);
+        
+        var treatmentRequests = _garageService.PrepareElectricCar(request);
+        _listProcessorService.AddVehicleRequestsToMatchingList(treatmentRequests);
 
         return Ok("Electric car added successfully");
     }
+    
 
     [HttpPost("AddFuelCar")]
     public async Task<IActionResult> AddFuelCar([FromBody] AddFuelCarRequest request)
     {
         await _validationService.CheckValidFuelCarInput(request);
-
-        var (fuelRequest, airRequest) = _garageService.PrepareFuelCar(request);
-        _listProcessorService.AddVehicleRequestsToMatchingList(fuelRequest, airRequest);
+        
+        var treatmentRequests = _garageService.PrepareFuelCar(request);
+        _listProcessorService.AddVehicleRequestsToMatchingList(treatmentRequests);
 
         return Ok("Fuel car added successfully");
     }

@@ -7,27 +7,58 @@ namespace Garage.Repositories;
 
 public class ListRepository : IListRepository
 {
-    public void AddVehicleRequestToMatchingList(TreatmentRequest firstRequest, TreatmentRequest secondRequest)
-    {
-        AddToMatchingList(firstRequest);
-        AddToMatchingList(secondRequest);
-    }
+    // used to be:
+    // public void AddVehicleRequestToMatchingList(TreatmentRequest firstRequest, TreatmentRequest secondRequest)
+    // {
+    //     AddToMatchingList(firstRequest);
+    //     AddToMatchingList(secondRequest);
+    // }
     
-    public void AddToMatchingList(TreatmentRequest request)
+    // public void AddVehicleRequestToMatchingList(List<TreatmentRequest> treatmentRequests)
+    // {
+    //     AddToMatchingList(firstRequest);
+    //     AddToMatchingList(secondRequest);
+    // }
+    //
+    // public void AddToMatchingList(TreatmentRequest request)
+    // {
+    //     TreatmentType treatmentType = request switch
+    //     {
+    //         FuelRequest => TreatmentType.Refuel,
+    //         ChargeRequest => TreatmentType.Recharge,
+    //         AirRequest => TreatmentType.Inflate,
+    //         _ => throw new ArgumentException("Unsupported request type")
+    //     };
+    //
+    //     if (InMemoryDatabase.TreatmentLists.TryGetValue(treatmentType, out var list))
+    //     {
+    //         list.AddLast(request);
+    //     }
+    // }
+    
+    public void AddVehicleRequestToMatchingList(List<TreatmentRequest> treatmentRequests)
     {
-        TreatmentType treatmentType = request switch
+        foreach (var request in treatmentRequests)
         {
-            FuelRequest => TreatmentType.Refuel,
-            ChargeRequest => TreatmentType.Recharge,
-            AirRequest => TreatmentType.Inflate,
-            _ => throw new ArgumentException("Unsupported request type")
-        };
-
-        if (InMemoryDatabase.TreatmentLists.TryGetValue(treatmentType, out var list))
-        {
-            list.AddLast(request);
+            if (request is FuelRequest)
+            {
+                InMemoryDatabase.TreatmentLists[TreatmentType.Refuel].AddLast(request);
+            }
+            else if (request is ChargeRequest)
+            {
+                InMemoryDatabase.TreatmentLists[TreatmentType.Recharge].AddLast(request);
+            }
+            else if (request is AirRequest)
+            {
+                InMemoryDatabase.TreatmentLists[TreatmentType.Inflate].AddLast(request);
+            }
+            else
+            {
+                throw new ArgumentException("Unsupported treatment request type.");
+            }
         }
     }
+
 
     // Returns the first request that's vehicle is not "IntTreatment" or null if vehicle / list doesn't exist.
     public TreatmentRequest? FindFirstAvailableVehicleRequest(ITreatmentService treatmentService)

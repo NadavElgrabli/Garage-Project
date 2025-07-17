@@ -100,7 +100,12 @@ public class GarageService
             ModelName = request.ModelName,
             LicensePlate = request.LicensePlate,
             RemainingEnergyPercentage = request.RemainingEnergyPercentage,
-            Engine = request.Engine,
+            Engine = new FuelEngine
+            {
+                CurrentEnergy = request.Engine.CurrentEnergy,
+                MaxEnergy = request.Engine.MaxEnergy,
+                FuelType = FuelType.Octane95
+            },
             Owner = request.Owner,
             Wheels = request.Wheels,
             Status = Status.Pending,
@@ -110,8 +115,10 @@ public class GarageService
             NumberOfDoors = request.NumberOfDoors,
             Color = request.Color
         };
+
         return car;
     }
+
 
     public FuelRequest CreateFuelRequest(Vehicle vehicle, float requestedLiters)
     {
@@ -149,24 +156,43 @@ public class GarageService
         return _garageRepository.DisplayVehiclesByStatus(status);
     }
     
-    public (TreatmentRequest FirstRequest, TreatmentRequest SecondRequest) PrepareElectricCar(AddElectricCarRequest request)
+    public List<TreatmentRequest> PrepareElectricCar(AddElectricCarRequest request)
     {
         var car = CreateElectricCar(request);
-        var chargeRequest = CreateChargeRequest(car, request.HoursToCharge);
-        var airRequest = CreateAirRequest(car, request.DesiredWheelPressures);
+        var treatmentRequests = new List<TreatmentRequest>();
+        if (car.TreatmentTypes.Contains(TreatmentType.Recharge))
+        {
+            var chargeRequest = CreateChargeRequest(car, request.HoursToCharge);
+            treatmentRequests.Add(chargeRequest);
+        }
+        if (car.TreatmentTypes.Contains(TreatmentType.Inflate))
+        {
+            var airRequest = CreateAirRequest(car, request.DesiredWheelPressures);
+            treatmentRequests.Add(airRequest);
+        }
         AddVehicleToGarage(car);
 
-        return (chargeRequest, airRequest);
+        return treatmentRequests;
     }
+    
 
-    public (TreatmentRequest FirstRequest, TreatmentRequest SecondRequest) PrepareFuelCar(AddFuelCarRequest request)
+    public List<TreatmentRequest> PrepareFuelCar(AddFuelCarRequest request)
     {
         var car = CreateFuelCar(request);
-        var fuelRequest = CreateFuelRequest(car, request.LitersToFuel);
-        var airRequest = CreateAirRequest(car, request.DesiredWheelPressures);
+        var treatmentRequests = new List<TreatmentRequest>();
+        if (car.TreatmentTypes.Contains(TreatmentType.Refuel))
+        {
+            var fuelRequest = CreateFuelRequest(car, request.LitersToFuel);
+            treatmentRequests.Add(fuelRequest);
+        }
+        if (car.TreatmentTypes.Contains(TreatmentType.Inflate))
+        {
+            var airRequest = CreateAirRequest(car, request.DesiredWheelPressures);
+            treatmentRequests.Add(airRequest);
+        }
         AddVehicleToGarage(car);
+        return treatmentRequests;
 
-        return (fuelRequest, airRequest);
     }
 
     

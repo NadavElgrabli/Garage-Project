@@ -27,10 +27,10 @@ public class ListProcessorService
 
         await Task.WhenAll(processingTasks);
     }
-
-    public void AddVehicleRequestsToMatchingList(TreatmentRequest firstRequest, TreatmentRequest secondRequest)
+    
+    public void AddVehicleRequestsToMatchingList(List<TreatmentRequest> treatmentRequests)
     {
-        _listRepository.AddVehicleRequestToMatchingList(firstRequest, secondRequest);
+        _listRepository.AddVehicleRequestToMatchingList(treatmentRequests);
     }
     
     public async Task ProcessTreatmentListAsync(ITreatmentService treatmentService)
