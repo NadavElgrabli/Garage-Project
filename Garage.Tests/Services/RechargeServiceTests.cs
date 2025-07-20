@@ -12,7 +12,7 @@ using Xunit;
 public class RechargeServiceTests
 {
     [Fact]
-    public async Task TreatAsync_ShouldRechargeVehicleFully()
+    public async Task TreatAsync_ShouldRechargeVehicleFully_WhenVehicleIsNotFullyCharged()
     {
         // Arrange
         var vehicle = new Car
@@ -46,7 +46,7 @@ public class RechargeServiceTests
     
     
     [Fact]
-    public async Task TreatAsync_ShouldOverChargeVehicle()
+    public async Task TreatAsync_ShouldOverChargeVehicle_WhenVehicleIsNotFullyCharged()
     {
         // Arrange
         var vehicle = new Car
@@ -79,7 +79,7 @@ public class RechargeServiceTests
     }
 
     [Fact]
-    public async Task TreatAsync_ShouldNotFullyRechargeVehicle()
+    public async Task TreatAsync_ShouldPartiallyRechargeVehicle_WhenVehicleIsNotFullyCharged()
     {
         // Arrange
         var vehicle = new Car
@@ -109,5 +109,4 @@ public class RechargeServiceTests
         Assert.DoesNotContain(TreatmentType.Recharge, vehicle.TreatmentTypes);
         Assert.Equal(Status.Ready, vehicle.Status); // No treatments left
     }
-    
 }

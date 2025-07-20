@@ -20,16 +20,16 @@ public class ListProcessorServiceTests
         var request = new ChargeRequest { Vehicle = vehicle };
 
         // Set up treatment type (needed for lock dictionary)
-        mockTreatmentService.Setup(x => x.GetTreatmentType()).Returns(TreatmentType.Recharge);
+        mockTreatmentService.Setup(treatmentService => treatmentService.GetTreatmentType()).Returns(TreatmentType.Recharge);
 
         // Initialize the lock for this treatment type
         InMemoryDatabase.TreatmentLocks[TreatmentType.Recharge] = new object();
 
         // First call: return a request, Second call: return null to break the loop
         mockListRepository
-            .SetupSequence(r => r.FindFirstAvailableVehicleRequest(mockTreatmentService.Object))
+            .SetupSequence(listRepository => listRepository.FindFirstAvailableVehicleRequest(mockTreatmentService.Object))
             .Returns(request)
-            .Returns((TreatmentRequest)null);
+            .Returns((TreatmentRequest?)null);
 
         // Always successfully remove the request
         mockListRepository
@@ -38,7 +38,7 @@ public class ListProcessorServiceTests
 
         // Simulate TreatAsync working normally
         mockTreatmentService
-            .Setup(t => t.TreatAsync(vehicle, request))
+            .Setup(treatmentService => treatmentService.TreatAsync(vehicle, request))
             .Returns(Task.CompletedTask);
 
         // Create the service under test
@@ -81,7 +81,7 @@ public class ListProcessorServiceTests
             .Returns(request1)
             .Returns(request2)
             .Returns(request3)
-            .Returns((TreatmentRequest)null); 
+            .Returns((TreatmentRequest?)null); 
 
         mockListRepository
             .Setup(r => r.RemoveRequest(mockTreatmentService.Object, It.IsAny<TreatmentRequest>()))
@@ -116,7 +116,7 @@ public class ListProcessorServiceTests
 
         mockListRepository
             .Setup(r => r.FindFirstAvailableVehicleRequest(mockTreatmentService.Object))
-            .Returns((TreatmentRequest)null);
+            .Returns((TreatmentRequest?)null);
 
         var service = new ListProcessorService(new[] { mockTreatmentService.Object }, mockListRepository.Object);
 
@@ -129,4 +129,7 @@ public class ListProcessorServiceTests
         mockListRepository.Verify(r => r.RemoveRequest(It.IsAny<ITreatmentService>(), It.IsAny<TreatmentRequest>()), Times.Never);
         mockTreatmentService.Verify(t => t.TreatAsync(It.IsAny<Vehicle>(), It.IsAny<TreatmentRequest>()), Times.Never);
     }
+    
+    //TODO: test for cutter vehicle
+    
 }

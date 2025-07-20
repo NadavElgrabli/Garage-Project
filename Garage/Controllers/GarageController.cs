@@ -9,13 +9,13 @@ namespace Garage.Controllers;
 [Route("api/[controller]")]
 public class GarageController : ControllerBase
 {
-    private readonly GarageService _garageService;
+    private readonly GarageManagementService _garageManagementService;
     private readonly ListProcessorService _listProcessorService;
     private readonly ValidationService _validationService;
 
-    public GarageController(GarageService garageService,  ListProcessorService listProcessorService,  ValidationService validationService)
+    public GarageController(GarageManagementService garageManagementService,  ListProcessorService listProcessorService,  ValidationService validationService)
     {
-        _garageService = garageService;
+        _garageManagementService = garageManagementService;
         _listProcessorService = listProcessorService;
         _validationService = validationService;
     }
@@ -23,7 +23,7 @@ public class GarageController : ControllerBase
     [HttpPost("InitializeGarage")]
     public IActionResult InitializeGarage([FromBody] GarageInit init)
     {
-        _garageService.InitializeGarage(init);
+        _garageManagementService.InitializeGarage(init);
         return Ok("Garage initialized successfully");
     }
 
@@ -31,14 +31,14 @@ public class GarageController : ControllerBase
     [HttpPost("GetVehiclesByStatus")]
     public IActionResult GetVehiclesByStatus([FromQuery] Status status)
     {
-        var vehicles = _garageService.DisplayVehiclesByStatus(status);
+        var vehicles = _garageManagementService.DisplayVehiclesByStatus(status);
         return Ok(vehicles);
     }
     
     [HttpPost("GetVehicleByLicensePlate")]
     public IActionResult GetVehicleByLicensePlate([FromQuery] string licensePlate)
     {
-        var vehicle = _garageService.GetVehicleByLicensePlateOrThrow(licensePlate);
+        var vehicle = _garageManagementService.GetVehicleByLicensePlateOrThrow(licensePlate);
         return Ok(vehicle);
     }
 
@@ -46,7 +46,7 @@ public class GarageController : ControllerBase
     [HttpPost("PickUpVehicleFromGarage")]
     public IActionResult PickUpVehicleFromGarage([FromQuery] string licensePlate)
     {
-        var vehicle = _garageService.PickUpVehicle(licensePlate);
+        var vehicle = _garageManagementService.PickUpVehicle(licensePlate);
         return Ok(vehicle);
     }
     
@@ -55,7 +55,8 @@ public class GarageController : ControllerBase
     {
         await _validationService.CheckValidElectricCarInput(request);
         
-        var treatmentRequests = _garageService.PrepareElectricCar(request);
+        var car = _garageManagementService.CreateAndAddElectricCarToGarage(request);
+        var treatmentRequests = _garageManagementService.GenerateElectricCarTreatmentRequests(car, request);
         _listProcessorService.AddVehicleRequestsToMatchingList(treatmentRequests);
 
         return Ok("Electric car added successfully");
@@ -67,7 +68,8 @@ public class GarageController : ControllerBase
     {
         await _validationService.CheckValidFuelCarInput(request);
         
-        var treatmentRequests = _garageService.PrepareFuelCar(request);
+        var car =  _garageManagementService.CreateAndAddFuelCarToGarage(request);
+        var treatmentRequests = _garageManagementService.GenerateFuelCarTreatmentRequests(car, request);
         _listProcessorService.AddVehicleRequestsToMatchingList(treatmentRequests);
 
         return Ok("Fuel car added successfully");

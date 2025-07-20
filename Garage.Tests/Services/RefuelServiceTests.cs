@@ -8,7 +8,7 @@ namespace Garage.Tests.Services;
 public class RefuelServiceTests
 {
     [Fact]
-    public async Task TreatAsync_ShouldRefuelVehicleFully()
+    public async Task TreatAsync_ShouldRefuelVehicleFully_WhenVehicleIsPartiallyFueled()
     {
         //Arrange
         var vehicle = new Car
@@ -39,7 +39,7 @@ public class RefuelServiceTests
     }
     
     [Fact]
-    public async Task TreatAsync_ShouldOverFuelVehicle()
+    public async Task TreatAsync_ShouldOverFuelVehicle_WhenVehicleIsPartiallyFueled()
     {
         // Arrange
         var vehicle = new Car
@@ -71,7 +71,7 @@ public class RefuelServiceTests
     }
     
     [Fact]
-    public async Task TreatAsync_ShouldNotFullyRefuelVehicle()
+    public async Task TreatAsync_ShouldPartiallyRefuelVehicle_WhenVehicleIsPartiallyFueled()
     {
         // Arrange
         var vehicle = new Car

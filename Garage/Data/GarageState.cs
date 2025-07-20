@@ -2,6 +2,8 @@
 
 public class GarageState
 {
+    
+    //TODO: not static
     public static SemaphoreSlim WorkersSemaphore;
     public static SemaphoreSlim FuelStationsRequestsSemaphore;
     public static SemaphoreSlim AirStationsRequestsSemaphore;

@@ -7,6 +7,7 @@ namespace Garage.Repositories;
 
 public class ListRepository : IListRepository
 {
+    //TODO: use handlers
     public void AddVehicleRequestToMatchingList(List<TreatmentRequest> treatmentRequests)
     {
         foreach (var request in treatmentRequests)
@@ -39,13 +40,7 @@ public class ListRepository : IListRepository
         if (!InMemoryDatabase.TreatmentLists.TryGetValue(type, out var list))
             return null;
 
-        foreach (var request in list)
-        {
-            if (request.Vehicle.Status != Status.InTreatment)
-                return request;
-        }
-
-        return null;
+        return list.FirstOrDefault(request => request.Vehicle.Status != Status.InTreatment);
     }
     
     // Returns true if the request was found and successfully removed; false if it was not found or the list does not exist.

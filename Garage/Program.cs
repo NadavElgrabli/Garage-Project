@@ -11,11 +11,13 @@ builder.Services.AddSingleton<ITreatmentService, RefuelService>();
 builder.Services.AddSingleton<ITreatmentService, RechargeService>();
 builder.Services.AddSingleton<ITreatmentService, InflateService>();
 builder.Services.AddSingleton<IGarageRepository, GarageRepository>();
-builder.Services.AddSingleton<GarageService>();
+builder.Services.AddSingleton<GarageManagementService>();
 builder.Services.AddSingleton<IListRepository, ListRepository>();
 builder.Services.AddSingleton<ListProcessorService>();
 builder.Services.AddSingleton<IValidationRepository, ValidationRepository>();
 builder.Services.AddSingleton<ValidationService>();
+builder.Services.AddSingleton<GarageOrchestratorService>();
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

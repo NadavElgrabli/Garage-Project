@@ -5,11 +5,11 @@ using Garage.Repositories;
 
 namespace Garage.Services;
 
-public class GarageService
+public class GarageManagementService
 {
     private readonly IGarageRepository _garageRepository;
 
-    public GarageService(IGarageRepository garageRepository)
+    public GarageManagementService(IGarageRepository garageRepository)
     {
         _garageRepository = garageRepository;
     }
@@ -17,9 +17,7 @@ public class GarageService
     public void InitializeGarage(GarageInit init)
     {
         if (init.Workers <= 0 || init.FuelStations <= 0 || init.AirStations <= 0 || init.ChargingStations <= 0)
-        {
-            throw new ArgumentException("All values must be positive");
-        }
+            throw new ArgumentException("All values must be positive.");
     
         GarageState.Initialize(
             init.Workers,
@@ -28,22 +26,21 @@ public class GarageService
             init.ChargingStations);
     }
 
-
-    public void AddVehicleToGarage(Vehicle vehicle)
+    private void AddVehicleToGarage(Vehicle vehicle)
     {
         _garageRepository.AddVehicleToGarage(vehicle);
     }
 
-    public void RemoveVehicleFromGarage(Vehicle vehicle)
+    private void RemoveVehicleFromGarage(Vehicle vehicle)
     {
         _garageRepository.RemoveVehicleFromGarage(vehicle);
     }
     
     public Vehicle PickUpVehicle(string licensePlate)
     {
-        var vehicle = GetVehicleByLicensePlate(licensePlate);
+        var vehicle = _garageRepository.GetVehicleByLicensePlate(licensePlate);
 
-        if (vehicle == null)
+        if (vehicle is null)
             throw new KeyNotFoundException($"Vehicle with license plate {licensePlate} is not in the garage.");
 
         if (vehicle.Status != Status.Ready)
@@ -53,25 +50,18 @@ public class GarageService
 
         return vehicle;
     }
-
-    
-    public Vehicle? GetVehicleByLicensePlate(string licensePlate)
-    {
-        return _garageRepository.GetVehicleByLicensePlate(licensePlate);
-    }
     
     public Vehicle GetVehicleByLicensePlateOrThrow(string licensePlate)
     {
         var vehicle = _garageRepository.GetVehicleByLicensePlate(licensePlate);
 
-        if (vehicle == null)
+        if (vehicle is null)
             throw new KeyNotFoundException("Vehicle not found");
 
         return vehicle;
     }
 
-    
-    public Car CreateElectricCar(AddElectricCarRequest request)
+    private Car CreateElectricCar(AddElectricCarRequest request)
     {
         var car = new Car
         {
@@ -92,7 +82,8 @@ public class GarageService
         return car;
     }
     
-    public Car CreateFuelCar(AddFuelCarRequest request)
+    //TODO: Factory design pattern to create cars
+    private Car CreateFuelCar(AddFuelCarRequest request)
     {
         var car = new Car
         {
@@ -119,18 +110,18 @@ public class GarageService
         return car;
     }
 
-
-    public FuelRequest CreateFuelRequest(Vehicle vehicle, float requestedLiters)
+    private FuelRequest CreateFuelRequest(Vehicle vehicle, float requestedLiters)
     {
         var fuelRequest = new FuelRequest
         {
             Vehicle = vehicle,
             RequestedLiters = requestedLiters,
         };
+        
         return fuelRequest;
     }
 
-    public ChargeRequest CreateChargeRequest(Vehicle vehicle, float requestedHoursToCharge)
+    private ChargeRequest CreateChargeRequest(Vehicle vehicle, float requestedHoursToCharge)
     {
         var chargeRequest = new ChargeRequest
         {
@@ -139,8 +130,8 @@ public class GarageService
         };
         return chargeRequest;
     }
-    
-    public AirRequest CreateAirRequest(Vehicle vehicle, List<float> desiredWheelPressures)
+
+    private AirRequest CreateAirRequest(Vehicle vehicle, List<float> desiredWheelPressures)
     {
         var airRequest = new AirRequest
         {
@@ -150,7 +141,6 @@ public class GarageService
         return airRequest;
     }
     
-
     public List<VehicleInfo> DisplayVehiclesByStatus(Status status)
     {
         return _garageRepository.DisplayVehiclesByStatus(status);
@@ -176,7 +166,26 @@ public class GarageService
         return treatmentRequests;
     }
     
+    public Car CreateAndAddElectricCarToGarage(AddElectricCarRequest request)
+    {
+        var car = CreateElectricCar(request);
+        AddVehicleToGarage(car);
+        return car;
+    }
+    
+    public List<TreatmentRequest> GenerateElectricCarTreatmentRequests(Car car, AddElectricCarRequest request)
+    {
+        var requests = new List<TreatmentRequest>();
 
+        if (car.TreatmentTypes.Contains(TreatmentType.Recharge))
+            requests.Add(CreateChargeRequest(car, request.HoursToCharge));
+
+        if (car.TreatmentTypes.Contains(TreatmentType.Inflate))
+            requests.Add(CreateAirRequest(car, request.DesiredWheelPressures));
+
+        return requests;
+    }
+    
     public List<TreatmentRequest> PrepareFuelCar(AddFuelCarRequest request)
     {
         var car = CreateFuelCar(request);
@@ -193,8 +202,29 @@ public class GarageService
             var airRequest = CreateAirRequest(car, request.DesiredWheelPressures);
             treatmentRequests.Add(airRequest);
         }
+        
         return treatmentRequests;
-
     }
     
+    public Car CreateAndAddFuelCarToGarage(AddFuelCarRequest request)
+    {
+        var car = CreateFuelCar(request);
+        AddVehicleToGarage(car);
+        return car;
+    }
+    
+    public List<TreatmentRequest> GenerateFuelCarTreatmentRequests(Car car, AddFuelCarRequest request)
+    {
+        var requests = new List<TreatmentRequest>();
+
+        if (car.TreatmentTypes.Contains(TreatmentType.Refuel))
+            requests.Add(CreateChargeRequest(car, request.LitersToFuel));
+
+        if (car.TreatmentTypes.Contains(TreatmentType.Inflate))
+            requests.Add(CreateAirRequest(car, request.DesiredWheelPressures));
+
+        return requests;
+    }
+    
+
 }
