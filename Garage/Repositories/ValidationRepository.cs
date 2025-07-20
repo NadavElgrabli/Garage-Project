@@ -7,10 +7,12 @@ namespace Garage.Repositories;
 public class ValidationRepository : IValidationRepository
 {
     private readonly GarageState _garageState;
+    private readonly InMemoryDatabase _db;
 
-    public ValidationRepository(GarageState garageState)
+    public ValidationRepository(GarageState garageState,  InMemoryDatabase db)
     {
         _garageState  = garageState;
+        _db = db;
     }
     public Task CheckValidElectricCarInput(AddElectricCarRequest request)
     {
@@ -55,7 +57,7 @@ public class ValidationRepository : IValidationRepository
         if (!_garageState.IsInitialized)
             errors.Add("Garage must be initialized before adding vehicles.");
 
-        if (InMemoryDatabase.Vehicles.ContainsKey(request.LicensePlate))
+        if (_db.Vehicles.ContainsKey(request.LicensePlate))
             errors.Add("Car already in garage.");
 
         if (request.TreatmentTypes.Count is > 2 or < 1)

@@ -10,6 +10,7 @@ namespace Garage.Controllers;
 // 3) ListProcessorServiceTests: add a test for a vehicle that cuts in line - done
 // 4) ListRepository:  use handlers
 // 5) remove from GarageState static fields - done
+// 6) remove all static from InMemoryDatabase - done
 [ApiController]
 [Route("api/[controller]")]
 public class GarageController : ControllerBase

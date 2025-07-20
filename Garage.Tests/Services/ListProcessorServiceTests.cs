@@ -15,6 +15,7 @@ public class ListProcessorServiceTests
         //Arrange
         var mockTreatmentService = new Mock<ITreatmentService>();
         var mockListRepository = new Mock<IListRepository>();
+        var db = new InMemoryDatabase();
 
         var vehicle = new Car(); 
         var request = new ChargeRequest { Vehicle = vehicle };
@@ -23,7 +24,7 @@ public class ListProcessorServiceTests
         mockTreatmentService.Setup(treatmentService => treatmentService.GetTreatmentType()).Returns(TreatmentType.Recharge);
 
         // Initialize the lock for this treatment type
-        InMemoryDatabase.TreatmentLocks[TreatmentType.Recharge] = new object();
+        db.TreatmentLocks[TreatmentType.Recharge] = new object();
 
         // First call: return a request, Second call: return null to break the loop
         mockListRepository
@@ -42,8 +43,11 @@ public class ListProcessorServiceTests
             .Returns(Task.CompletedTask);
 
         // Create the service under test
-        var service = new ListProcessorService(new[] { mockTreatmentService.Object }, mockListRepository.Object);
-
+        var service = new ListProcessorService(
+            new[] { mockTreatmentService.Object },
+            mockListRepository.Object,
+            db 
+        );
         // Act
         // We'll run the method for a short time and let it process once
         var processTask = Task.Run(async () =>
@@ -65,7 +69,8 @@ public class ListProcessorServiceTests
         // Arrange
         var mockTreatmentService = new Mock<ITreatmentService>();
         var mockListRepository = new Mock<IListRepository>();
-
+        var db = new InMemoryDatabase();
+        
         var vehicle1 = new Car();
         var vehicle2 = new Car();
         var vehicle3 = new Car();
@@ -74,7 +79,7 @@ public class ListProcessorServiceTests
         var request3 = new ChargeRequest { Vehicle = vehicle3 };
 
         mockTreatmentService.Setup(x => x.GetTreatmentType()).Returns(TreatmentType.Recharge);
-        InMemoryDatabase.TreatmentLocks[TreatmentType.Recharge] = new object();
+        db.TreatmentLocks[TreatmentType.Recharge] = new object();
 
         mockListRepository
             .SetupSequence(r => r.FindFirstAvailableVehicleRequest(mockTreatmentService.Object))
@@ -91,7 +96,10 @@ public class ListProcessorServiceTests
             .Setup(t => t.TreatAsync(It.IsAny<Vehicle>(), It.IsAny<TreatmentRequest>()))
             .Returns(Task.CompletedTask);
 
-        var service = new ListProcessorService(new[] { mockTreatmentService.Object }, mockListRepository.Object);
+        var service = new ListProcessorService(
+            new[] { mockTreatmentService.Object },
+            mockListRepository.Object,
+            db);
 
         // Act
         var task = Task.Run(async () => await service.ProcessTreatmentListAsync(mockTreatmentService.Object));
@@ -110,15 +118,20 @@ public class ListProcessorServiceTests
         // Arrange
         var mockTreatmentService = new Mock<ITreatmentService>();
         var mockListRepository = new Mock<IListRepository>();
+        var db = new InMemoryDatabase();
+
 
         mockTreatmentService.Setup(x => x.GetTreatmentType()).Returns(TreatmentType.Recharge);
-        InMemoryDatabase.TreatmentLocks[TreatmentType.Recharge] = new object();
+        db.TreatmentLocks[TreatmentType.Recharge] = new object();
 
         mockListRepository
             .Setup(r => r.FindFirstAvailableVehicleRequest(mockTreatmentService.Object))
             .Returns((TreatmentRequest?)null);
 
-        var service = new ListProcessorService(new[] { mockTreatmentService.Object }, mockListRepository.Object);
+        var service = new ListProcessorService(
+            new[] { mockTreatmentService.Object },
+            mockListRepository.Object,
+            db);
 
         // Act
         var task = Task.Run(async () => await service.ProcessTreatmentListAsync(mockTreatmentService.Object));
@@ -129,7 +142,4 @@ public class ListProcessorServiceTests
         mockListRepository.Verify(r => r.RemoveRequest(It.IsAny<ITreatmentService>(), It.IsAny<TreatmentRequest>()), Times.Never);
         mockTreatmentService.Verify(t => t.TreatAsync(It.IsAny<Vehicle>(), It.IsAny<TreatmentRequest>()), Times.Never);
     }
-    
-    //TODO: test for cutter vehicle
-    
 }

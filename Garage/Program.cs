@@ -19,8 +19,7 @@ builder.Services.AddSingleton<IValidationRepository, ValidationRepository>();
 builder.Services.AddSingleton<ValidationService>();
 builder.Services.AddSingleton<GarageOrchestratorService>();
 builder.Services.AddSingleton<GarageState>();
-
-
+builder.Services.AddSingleton<InMemoryDatabase>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

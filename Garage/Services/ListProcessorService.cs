@@ -8,16 +8,17 @@ public class ListProcessorService
 {
     private readonly IEnumerable<ITreatmentService> _treatmentServices;
     private readonly IListRepository _listRepository;
-
-
+    private readonly InMemoryDatabase _db;
+    
     public ListProcessorService(
         IEnumerable<ITreatmentService> treatmentServices,
-        IListRepository listRepository)
+        IListRepository listRepository,
+        InMemoryDatabase db)
     {
         _treatmentServices = treatmentServices;
         _listRepository = listRepository;
+        _db = db;
     }
-
     
     public async Task StartProcessingAsync()
     {
@@ -42,7 +43,7 @@ public class ListProcessorService
             TreatmentRequest? request;
 
             // Lock only to safely find & remove the first available request
-            lock (InMemoryDatabase.TreatmentLocks[treatmentType])
+            lock (_db.TreatmentLocks[treatmentType])
             {
                 request = _listRepository.FindFirstAvailableVehicleRequest(treatmentService);
                 

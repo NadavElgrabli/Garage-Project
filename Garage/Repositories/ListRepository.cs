@@ -7,22 +7,28 @@ namespace Garage.Repositories;
 
 public class ListRepository : IListRepository
 {
-    //TODO: use handlers in AddVehicleRequestToMatchingList
+    private readonly InMemoryDatabase _db;
+
+    public ListRepository(InMemoryDatabase db)
+    {
+        _db = db;
+    }
+    
     public void AddVehicleRequestToMatchingList(List<TreatmentRequest> treatmentRequests)
     {
         foreach (var request in treatmentRequests)
         {
             if (request is FuelRequest)
             {
-                InMemoryDatabase.TreatmentLists[TreatmentType.Refuel].AddLast(request);
+                _db.TreatmentLists[TreatmentType.Refuel].AddLast(request);
             }
             else if (request is ChargeRequest)
             {
-                InMemoryDatabase.TreatmentLists[TreatmentType.Recharge].AddLast(request);
+                _db.TreatmentLists[TreatmentType.Recharge].AddLast(request);
             }
             else if (request is AirRequest)
             {
-                InMemoryDatabase.TreatmentLists[TreatmentType.Inflate].AddLast(request);
+                _db.TreatmentLists[TreatmentType.Inflate].AddLast(request);
             }
             else
             {
@@ -36,7 +42,7 @@ public class ListRepository : IListRepository
     {
         var type = treatmentService.GetTreatmentType();
 
-        if (!InMemoryDatabase.TreatmentLists.TryGetValue(type, out var list))
+        if (!_db.TreatmentLists.TryGetValue(type, out var list))
             return null;
 
         return list.FirstOrDefault(request => request.Vehicle.Status != Status.InTreatment);
@@ -47,10 +53,9 @@ public class ListRepository : IListRepository
     {
         var type = treatmentService.GetTreatmentType();
 
-        if (!InMemoryDatabase.TreatmentLists.TryGetValue(type, out var list))
+        if (!_db.TreatmentLists.TryGetValue(type, out var list))
             return false;
 
         return list.Remove(request);
     }
-    
 }

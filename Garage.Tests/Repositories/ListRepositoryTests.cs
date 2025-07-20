@@ -21,6 +21,7 @@ public class ListRepositoryTests
         var vehicle1 = new Car { Status = Status.InTreatment };
         var vehicle2 = new Car { Status = Status.InTreatment };
         var vehicle3 = new Car { Status = Status.Pending };
+        
         var request1 = new ChargeRequest { Vehicle = vehicle1 };
         var request2 = new ChargeRequest { Vehicle = vehicle2 };
         var request3 = new ChargeRequest { Vehicle = vehicle3 };
@@ -30,9 +31,10 @@ public class ListRepositoryTests
         list.AddLast(request2); // Should be skipped
         list.AddLast(request3);
 
-        InMemoryDatabase.TreatmentLists[TreatmentType.Recharge] = list;
-
-        var repo = new ListRepository();
+        var db = new InMemoryDatabase();
+        db.TreatmentLists[TreatmentType.Recharge] = list;
+        
+        var repo = new ListRepository(db);
 
         // Act
         var result = repo.FindFirstAvailableVehicleRequest(treatmentService.Object);
