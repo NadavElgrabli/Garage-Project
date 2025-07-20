@@ -6,6 +6,13 @@ namespace Garage.Services;
 
 public class RefuelService : ITreatmentService
 {
+    private readonly GarageState _garageState;
+
+    public RefuelService(GarageState garageState)
+    {
+        _garageState = garageState;
+    }
+    
     public async Task TreatAsync(Vehicle vehicle, TreatmentRequest request)
     {
         if (request is not FuelRequest fuelRequest)
@@ -13,8 +20,8 @@ public class RefuelService : ITreatmentService
 
         float litersToFuel = fuelRequest.RequestedLiters;
 
-        await GarageState.FuelStationsRequestsSemaphore.WaitAsync();
-        await GarageState.WorkersSemaphore.WaitAsync();
+        await _garageState.FuelStationsRequestsSemaphore.WaitAsync();
+        await _garageState.WorkersSemaphore.WaitAsync();
 
         try
         {
@@ -45,8 +52,8 @@ public class RefuelService : ITreatmentService
         }
         finally
         {
-            GarageState.WorkersSemaphore.Release();
-            GarageState.FuelStationsRequestsSemaphore.Release();
+            _garageState.WorkersSemaphore.Release();
+            _garageState.FuelStationsRequestsSemaphore.Release();
         }
     }
 

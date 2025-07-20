@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Garage.Data;
 using Garage.Middlewares;
 using Garage.Repositories;
 using Garage.Services;
@@ -17,6 +18,8 @@ builder.Services.AddSingleton<ListProcessorService>();
 builder.Services.AddSingleton<IValidationRepository, ValidationRepository>();
 builder.Services.AddSingleton<ValidationService>();
 builder.Services.AddSingleton<GarageOrchestratorService>();
+builder.Services.AddSingleton<GarageState>();
+
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

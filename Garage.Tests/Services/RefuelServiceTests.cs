@@ -24,9 +24,9 @@ public class RefuelServiceTests
             RequestedLiters = 4
         };
         
-        var service = new RefuelService();
-        GarageState.FuelStationsRequestsSemaphore = new SemaphoreSlim(1);
-        GarageState.WorkersSemaphore = new SemaphoreSlim(1);
+        var garageState = new GarageState();
+        garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
+        var service = new RefuelService(garageState);
         
         //Act
         await service.TreatAsync(vehicle, request);
@@ -55,10 +55,9 @@ public class RefuelServiceTests
             RequestedLiters = 10 // clearly overcharging (10 > 3 left)
         };
 
-        var service = new RefuelService();
-
-        GarageState.FuelStationsRequestsSemaphore = new SemaphoreSlim(1);
-        GarageState.WorkersSemaphore = new SemaphoreSlim(1);
+        var garageState = new GarageState();
+        garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
+        var service = new RefuelService(garageState);
 
         // Act
         await service.TreatAsync(vehicle, request);
@@ -87,10 +86,9 @@ public class RefuelServiceTests
             RequestedLiters = 3 // Partial refuel: 2 + 3 = 5 < 6
         };
 
-        var service = new RefuelService();
-
-        GarageState.FuelStationsRequestsSemaphore = new SemaphoreSlim(1);
-        GarageState.WorkersSemaphore = new SemaphoreSlim(1);
+        var garageState = new GarageState();
+        garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
+        var service = new RefuelService(garageState);
 
         // Act
         await service.TreatAsync(vehicle, request);

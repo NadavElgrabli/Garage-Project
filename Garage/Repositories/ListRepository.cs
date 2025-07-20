@@ -7,7 +7,7 @@ namespace Garage.Repositories;
 
 public class ListRepository : IListRepository
 {
-    //TODO: use handlers
+    //TODO: use handlers in AddVehicleRequestToMatchingList
     public void AddVehicleRequestToMatchingList(List<TreatmentRequest> treatmentRequests)
     {
         foreach (var request in treatmentRequests)

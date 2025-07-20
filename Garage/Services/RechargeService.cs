@@ -6,6 +6,13 @@ namespace Garage.Services;
 
 public class RechargeService : ITreatmentService
 {
+    private readonly GarageState _garageState;
+
+    public RechargeService(GarageState garageState)
+    {
+        _garageState = garageState;
+    }
+    
     public async Task TreatAsync(Vehicle vehicle, TreatmentRequest request)
     {
         if (request is not ChargeRequest chargeRequest)
@@ -13,8 +20,8 @@ public class RechargeService : ITreatmentService
 
         float hoursToCharge = chargeRequest.RequestedHoursToCharge;
 
-        await GarageState.ChargeStationsRequestsSemaphore.WaitAsync();
-        await GarageState.WorkersSemaphore.WaitAsync();
+        await _garageState.ChargeStationsRequestsSemaphore.WaitAsync();
+        await _garageState.WorkersSemaphore.WaitAsync();
 
         try
         {
@@ -54,8 +61,8 @@ public class RechargeService : ITreatmentService
         }
         finally
         {
-            GarageState.WorkersSemaphore.Release();
-            GarageState.ChargeStationsRequestsSemaphore.Release();
+            _garageState.WorkersSemaphore.Release();
+            _garageState.ChargeStationsRequestsSemaphore.Release();
         }
     }
 

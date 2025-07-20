@@ -6,6 +6,12 @@ namespace Garage.Repositories;
 
 public class ValidationRepository : IValidationRepository
 {
+    private readonly GarageState _garageState;
+
+    public ValidationRepository(GarageState garageState)
+    {
+        _garageState  = garageState;
+    }
     public Task CheckValidElectricCarInput(AddElectricCarRequest request)
     {
         var errors = new List<string>();
@@ -46,7 +52,7 @@ public class ValidationRepository : IValidationRepository
     
     private void ValidateCommonCarInput(Vehicle request, List<float> desiredWheelPressures, List<string> errors)
     {
-        if (!GarageState.IsInitialized)
+        if (!_garageState.IsInitialized)
             errors.Add("Garage must be initialized before adding vehicles.");
 
         if (InMemoryDatabase.Vehicles.ContainsKey(request.LicensePlate))
@@ -75,9 +81,4 @@ public class ValidationRepository : IValidationRepository
                 errors.Add($"Wheel {i + 1} current pressure is {request.Wheels[i].CurrentPressure}, which is above the maximum (30).");
         }
     }
-
-    
-    
-
-
 }

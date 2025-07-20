@@ -28,11 +28,9 @@ public class RechargeServiceTests
             RequestedHoursToCharge = 4
         };
 
-        var service = new RechargeService();
-
-        // Pre-set semaphores to simulate availability
-        GarageState.ChargeStationsRequestsSemaphore = new SemaphoreSlim(1);
-        GarageState.WorkersSemaphore = new SemaphoreSlim(1);
+        var garageState = new GarageState();
+        garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
+        var service = new RechargeService(garageState);
 
         // Act
         await service.TreatAsync(vehicle, request);
@@ -62,10 +60,9 @@ public class RechargeServiceTests
             RequestedHoursToCharge = 10 // clearly overcharging (10 > 3 left)
         };
 
-        var service = new RechargeService();
-
-        GarageState.ChargeStationsRequestsSemaphore = new SemaphoreSlim(1);
-        GarageState.WorkersSemaphore = new SemaphoreSlim(1);
+        var garageState = new GarageState();
+        garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
+        var service = new RechargeService(garageState);
 
         // Act
         await service.TreatAsync(vehicle, request);
@@ -95,10 +92,9 @@ public class RechargeServiceTests
             RequestedHoursToCharge = 5 // Partial charge: 2 + 5 = 7 < 10
         };
 
-        var service = new RechargeService();
-
-        GarageState.ChargeStationsRequestsSemaphore = new SemaphoreSlim(1);
-        GarageState.WorkersSemaphore = new SemaphoreSlim(1);
+        var garageState = new GarageState();
+        garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
+        var service = new RechargeService(garageState);
 
         // Act
         await service.TreatAsync(vehicle, request);

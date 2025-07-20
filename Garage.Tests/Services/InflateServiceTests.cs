@@ -36,11 +36,9 @@ public class InflateServiceTests
             DesiredWheelPressures = desiredPressures
         };
 
-        var service = new InflateService();
-
-        // Make sure semaphores are available
-        GarageState.AirStationsRequestsSemaphore = new SemaphoreSlim(1);
-        GarageState.WorkersSemaphore = new SemaphoreSlim(1);
+        var garageState = new GarageState();
+        garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
+        var service = new InflateService(garageState);
 
         // Act
         await service.TreatAsync(vehicle, request);
@@ -85,11 +83,9 @@ public class InflateServiceTests
             DesiredWheelPressures = desiredPressures
         };
 
-        var service = new InflateService();
-
-        // Make sure semaphores are available
-        GarageState.AirStationsRequestsSemaphore = new SemaphoreSlim(1);
-        GarageState.WorkersSemaphore = new SemaphoreSlim(1);
+        var garageState = new GarageState();
+        garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
+        var service = new InflateService(garageState);
 
         // Act
         await service.TreatAsync(vehicle, request);
@@ -138,11 +134,9 @@ public class InflateServiceTests
             DesiredWheelPressures = desiredPressures
         };
 
-        var service = new InflateService();
-
-        // Make sure semaphores are available
-        GarageState.AirStationsRequestsSemaphore = new SemaphoreSlim(1);
-        GarageState.WorkersSemaphore = new SemaphoreSlim(1);
+        var garageState = new GarageState();
+        garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
+        var service = new InflateService(garageState);
 
         // Act
         await service.TreatAsync(vehicle, request);
@@ -186,10 +180,9 @@ public class InflateServiceTests
             DesiredWheelPressures = desiredPressures
         };
 
-        var service = new InflateService();
-
-        GarageState.AirStationsRequestsSemaphore = new SemaphoreSlim(1);
-        GarageState.WorkersSemaphore = new SemaphoreSlim(1);
+        var garageState = new GarageState();
+        garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
+        var service = new InflateService(garageState);
 
         // Act
         await service.TreatAsync(vehicle, request);

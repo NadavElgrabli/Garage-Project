@@ -2,16 +2,14 @@
 
 public class GarageState
 {
-    
-    //TODO: not static
-    public static SemaphoreSlim WorkersSemaphore;
-    public static SemaphoreSlim FuelStationsRequestsSemaphore;
-    public static SemaphoreSlim AirStationsRequestsSemaphore;
-    public static SemaphoreSlim ChargeStationsRequestsSemaphore;
-    public static bool IsInitialized { get; private set; } = false;
+    public SemaphoreSlim? WorkersSemaphore;
+    public SemaphoreSlim? FuelStationsRequestsSemaphore;
+    public SemaphoreSlim? AirStationsRequestsSemaphore;
+    public SemaphoreSlim? ChargeStationsRequestsSemaphore;
+    public bool IsInitialized { get; private set; }
 
 
-    public static void Initialize(int workers, int fuelStations, int airStations, int chargeStations)
+    public void Initialize(int workers, int fuelStations, int airStations, int chargeStations)
     {
         WorkersSemaphore = new SemaphoreSlim(workers, workers);
         FuelStationsRequestsSemaphore = new SemaphoreSlim(fuelStations, fuelStations);

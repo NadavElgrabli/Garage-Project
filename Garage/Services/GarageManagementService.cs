@@ -8,10 +8,13 @@ namespace Garage.Services;
 public class GarageManagementService
 {
     private readonly IGarageRepository _garageRepository;
+    private readonly GarageState _garageState;
 
-    public GarageManagementService(IGarageRepository garageRepository)
+
+    public GarageManagementService(IGarageRepository garageRepository, GarageState  garageState)
     {
         _garageRepository = garageRepository;
+        _garageState = garageState;
     }
     
     public void InitializeGarage(GarageInit init)
@@ -19,7 +22,7 @@ public class GarageManagementService
         if (init.Workers <= 0 || init.FuelStations <= 0 || init.AirStations <= 0 || init.ChargingStations <= 0)
             throw new ArgumentException("All values must be positive.");
     
-        GarageState.Initialize(
+        _garageState.Initialize(
             init.Workers,
             init.FuelStations,
             init.AirStations,

@@ -6,6 +6,13 @@ namespace Garage.Services;
 
 public class InflateService : ITreatmentService
 {
+    private readonly GarageState _garageState;
+
+    public InflateService(GarageState garageState)
+    {
+        _garageState = garageState;
+    }
+    
     public async Task TreatAsync(Vehicle vehicle, TreatmentRequest request)
     {
         if (request is not AirRequest airRequest)
@@ -13,8 +20,8 @@ public class InflateService : ITreatmentService
 
         List<float> desiredPressures = airRequest.DesiredWheelPressures;
 
-        await GarageState.AirStationsRequestsSemaphore.WaitAsync();
-        await GarageState.WorkersSemaphore.WaitAsync();
+        await _garageState.AirStationsRequestsSemaphore.WaitAsync();
+        await _garageState.WorkersSemaphore.WaitAsync();
 
         try
         {
@@ -50,8 +57,8 @@ public class InflateService : ITreatmentService
         }
         finally
         {
-            GarageState.WorkersSemaphore.Release();
-            GarageState.AirStationsRequestsSemaphore.Release();
+            _garageState.WorkersSemaphore.Release();
+            _garageState.AirStationsRequestsSemaphore.Release();
         }
     }
 
