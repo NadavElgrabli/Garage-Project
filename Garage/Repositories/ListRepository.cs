@@ -30,8 +30,7 @@ public class ListRepository : IListRepository
             }
         }
     }
-
-
+    
     // Returns the first request that's vehicle is not "IntTreatment" or null if vehicle / list doesn't exist.
     public TreatmentRequest? FindFirstAvailableVehicleRequest(ITreatmentService treatmentService)
     {

@@ -4,7 +4,12 @@ using Garage.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Garage.Controllers;
-
+//TODO:
+// 1) create orchestrator service for controller + separate function "register vehicle" - done
+// 2) Factory design pattern to create cars (garageManagementService), 
+// 3) ListProcessorServiceTests: add a test for a vehicle that cuts in line - done
+// 4) ListRepository:  use handlers
+// 5) remove from GarageState static fields
 [ApiController]
 [Route("api/[controller]")]
 public class GarageController : ControllerBase

@@ -66,7 +66,6 @@ public class ListProcessorService
             }
             
             // await Task.Delay(100) gives the thread a chance to pause and reduce CPU usage(?)
-            //TODO: read how to do the delay via Iconfiguration
             WaitAndRetry:
             await Task.Delay(100);
         }
