@@ -18,6 +18,14 @@ public class InMemoryDatabase
         Enum.GetValues(typeof(TreatmentType))
             .Cast<TreatmentType>()
             .ToDictionary(t => t, t => new object());
+    
+    public Dictionary<Type, TreatmentType> RequestTypeToTreatmentType = new()
+    {
+        { typeof(FuelRequest), TreatmentType.Refuel },
+        { typeof(ChargeRequest), TreatmentType.Recharge },
+        { typeof(AirRequest), TreatmentType.Inflate }
+    };
+
 }
 
 

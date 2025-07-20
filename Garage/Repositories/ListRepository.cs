@@ -14,26 +14,41 @@ public class ListRepository : IListRepository
         _db = db;
     }
     
+    // //TODO: Use handlers instead of if, if else, etc...
+    // public void AddVehicleRequestToMatchingList(List<TreatmentRequest> treatmentRequests)
+    // {
+    //     foreach (var request in treatmentRequests)
+    //     {
+    //         if (request is FuelRequest)
+    //         {
+    //             _db.TreatmentLists[TreatmentType.Refuel].AddLast(request);
+    //         }
+    //         else if (request is ChargeRequest)
+    //         {
+    //             _db.TreatmentLists[TreatmentType.Recharge].AddLast(request);
+    //         }
+    //         else if (request is AirRequest)
+    //         {
+    //             _db.TreatmentLists[TreatmentType.Inflate].AddLast(request);
+    //         }
+    //         else
+    //         {
+    //             throw new ArgumentException("Unsupported treatment request type.");
+    //         }
+    //     }
+    // }
+    
     public void AddVehicleRequestToMatchingList(List<TreatmentRequest> treatmentRequests)
     {
         foreach (var request in treatmentRequests)
         {
-            if (request is FuelRequest)
+            var requestType = request.GetType();
+            if (!_db.RequestTypeToTreatmentType.TryGetValue(requestType, out var treatmentType))
             {
-                _db.TreatmentLists[TreatmentType.Refuel].AddLast(request);
+                throw new ArgumentException($"Unsupported treatment request type: {requestType.Name}");
             }
-            else if (request is ChargeRequest)
-            {
-                _db.TreatmentLists[TreatmentType.Recharge].AddLast(request);
-            }
-            else if (request is AirRequest)
-            {
-                _db.TreatmentLists[TreatmentType.Inflate].AddLast(request);
-            }
-            else
-            {
-                throw new ArgumentException("Unsupported treatment request type.");
-            }
+
+            _db.TreatmentLists[treatmentType].AddLast(request);
         }
     }
     
