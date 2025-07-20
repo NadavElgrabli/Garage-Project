@@ -218,7 +218,7 @@ public class GarageManagementService
         var requests = new List<TreatmentRequest>();
 
         if (car.TreatmentTypes.Contains(TreatmentType.Refuel))
-            requests.Add(CreateChargeRequest(car, request.LitersToFuel));
+            requests.Add(CreateFuelRequest(car, request.LitersToFuel));
 
         if (car.TreatmentTypes.Contains(TreatmentType.Inflate))
             requests.Add(CreateAirRequest(car, request.DesiredWheelPressures));

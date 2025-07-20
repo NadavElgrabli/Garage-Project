@@ -60,5 +60,4 @@ public class GarageController : ControllerBase
         await  _garageOrchestratorService.AddFuelCar(request);
         return Ok("Fuel car added successfully");
     }
-
 }
