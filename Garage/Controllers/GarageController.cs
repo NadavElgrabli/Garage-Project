@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace Garage.Controllers;
 //TODO:
 // 1) create orchestrator service for controller + separate function "register vehicle" - done
-// 2) Factory design pattern to create cars (garageManagementService) 
+// 2) Factory design pattern to create cars (garageManagementService) - done (check program.cs)
 // 3) ListProcessorServiceTests: add a test for a vehicle that cuts in line - done
-// 4) ListRepository:  use handlers
+// 4) ListRepository:  use handlers - done
 // 5) remove from GarageState static fields - done
 // 6) remove all static from InMemoryDatabase - done
 [ApiController]

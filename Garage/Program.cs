@@ -1,6 +1,7 @@
-using System.ComponentModel.DataAnnotations;
 using Garage.Data;
+using Garage.Factories;
 using Garage.Middlewares;
+using Garage.Models;
 using Garage.Repositories;
 using Garage.Services;
 
@@ -20,6 +21,13 @@ builder.Services.AddSingleton<ValidationService>();
 builder.Services.AddSingleton<GarageOrchestratorService>();
 builder.Services.AddSingleton<GarageState>();
 builder.Services.AddSingleton<InMemoryDatabase>();
+builder.Services.AddTransient<ElectricCarFactory>();
+builder.Services.AddTransient<FuelCarFactory>();
+builder.Services.AddSingleton(provider => new Dictionary<Type, IVehicleFactory>
+{
+    { typeof(AddElectricCarRequest), provider.GetRequiredService<ElectricCarFactory>() },
+    { typeof(AddFuelCarRequest), provider.GetRequiredService<FuelCarFactory>() }
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

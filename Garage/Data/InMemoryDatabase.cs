@@ -19,19 +19,11 @@ public class InMemoryDatabase
             .Cast<TreatmentType>()
             .ToDictionary(t => t, t => new object());
     
-    public Dictionary<Type, TreatmentType> RequestTypeToTreatmentType = new()
+    public readonly Dictionary<Type, TreatmentType> RequestTypeToTreatmentType = new()
     {
         { typeof(FuelRequest), TreatmentType.Refuel },
         { typeof(ChargeRequest), TreatmentType.Recharge },
         { typeof(AirRequest), TreatmentType.Inflate }
     };
-
 }
 
-
-// public Dictionary<Type, ITreatmentService> TreatmentHandlers { get; } = new()
-// {
-//     { typeof(FuelRequest), new RefuelService() },
-//     { typeof(ChargeRequest), new RechargeService() },
-//     { typeof(AirRequest), new InflateService() }
-// };

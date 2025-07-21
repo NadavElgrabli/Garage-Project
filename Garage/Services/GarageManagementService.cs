@@ -1,5 +1,6 @@
 ﻿using Garage.Data;
 using Garage.Enums;
+using Garage.Factories;
 using Garage.Models;
 using Garage.Repositories;
 
@@ -9,12 +10,16 @@ public class GarageManagementService
 {
     private readonly IGarageRepository _garageRepository;
     private readonly GarageState _garageState;
-
-
-    public GarageManagementService(IGarageRepository garageRepository, GarageState  garageState)
+    private readonly Dictionary<Type, IVehicleFactory> _vehicleFactories;
+    
+    public GarageManagementService(
+        IGarageRepository garageRepository,
+        GarageState  garageState,
+        Dictionary<Type, IVehicleFactory> vehicleFactories)
     {
         _garageRepository = garageRepository;
         _garageState = garageState;
+        _vehicleFactories = vehicleFactories;
     }
     
     public void InitializeGarage(GarageInit init)
@@ -63,7 +68,19 @@ public class GarageManagementService
 
         return vehicle;
     }
+    
+    private Vehicle CreateVehicle(Vehicle request)
+    {
+        var requestType = request.GetType();
 
+        if (!_vehicleFactories.TryGetValue(requestType, out var factory))
+            throw new InvalidOperationException($"No factory registered for request type {requestType.Name}");
+
+        return factory.CreateVehicle(request);
+    }
+
+
+    //TODO: Factory design pattern to create cars
     private Car CreateElectricCar(AddElectricCarRequest request)
     {
         var car = new Car
@@ -149,34 +166,7 @@ public class GarageManagementService
         return _garageRepository.DisplayVehiclesByStatus(status);
     }
     
-    public List<TreatmentRequest> PrepareElectricCar(AddElectricCarRequest request)
-    {
-        var car = CreateElectricCar(request);
-        AddVehicleToGarage(car);
-
-        var treatmentRequests = new List<TreatmentRequest>();
-        if (car.TreatmentTypes.Contains(TreatmentType.Recharge))
-        {
-            var chargeRequest = CreateChargeRequest(car, request.HoursToCharge);
-            treatmentRequests.Add(chargeRequest);
-        }
-        if (car.TreatmentTypes.Contains(TreatmentType.Inflate))
-        {
-            var airRequest = CreateAirRequest(car, request.DesiredWheelPressures);
-            treatmentRequests.Add(airRequest);
-        }
-
-        return treatmentRequests;
-    }
-    
-    public Car CreateAndAddElectricCarToGarage(AddElectricCarRequest request)
-    {
-        var car = CreateElectricCar(request);
-        AddVehicleToGarage(car);
-        return car;
-    }
-    
-    public List<TreatmentRequest> GenerateElectricCarTreatmentRequests(Car car, AddElectricCarRequest request)
+    public List<TreatmentRequest> GenerateElectricCarTreatmentRequests(Vehicle car, AddElectricCarRequest request)
     {
         var requests = new List<TreatmentRequest>();
 
@@ -189,34 +179,35 @@ public class GarageManagementService
         return requests;
     }
     
-    public List<TreatmentRequest> PrepareFuelCar(AddFuelCarRequest request)
-    {
-        var car = CreateFuelCar(request);
-        AddVehicleToGarage(car);
-
-        var treatmentRequests = new List<TreatmentRequest>();
-        if (car.TreatmentTypes.Contains(TreatmentType.Refuel))
-        {
-            var fuelRequest = CreateFuelRequest(car, request.LitersToFuel);
-            treatmentRequests.Add(fuelRequest);
-        }
-        if (car.TreatmentTypes.Contains(TreatmentType.Inflate))
-        {
-            var airRequest = CreateAirRequest(car, request.DesiredWheelPressures);
-            treatmentRequests.Add(airRequest);
-        }
-        
-        return treatmentRequests;
-    }
+    // public Car CreateAndAddElectricCarToGarage(AddElectricCarRequest request)
+    // {
+    //     var car = CreateElectricCar(request);
+    //     AddVehicleToGarage(car);
+    //     return car;
+    // }
     
-    public Car CreateAndAddFuelCarToGarage(AddFuelCarRequest request)
+    public Vehicle CreateAndAddElectricCarToGarage(AddElectricCarRequest request)
     {
-        var car = CreateFuelCar(request);
+        var car = CreateVehicle(request);
         AddVehicleToGarage(car);
         return car;
     }
     
-    public List<TreatmentRequest> GenerateFuelCarTreatmentRequests(Car car, AddFuelCarRequest request)
+    public Vehicle CreateAndAddFuelCarToGarage(AddFuelCarRequest request)
+    {
+        var car = CreateVehicle(request);
+        AddVehicleToGarage(car);
+        return car;
+    }
+    
+    // public Car CreateAndAddFuelCarToGarage(AddFuelCarRequest request)
+    // {
+    //     var car = CreateFuelCar(request);
+    //     AddVehicleToGarage(car);
+    //     return car;
+    // }
+    
+    public List<TreatmentRequest> GenerateFuelCarTreatmentRequests(Vehicle car, AddFuelCarRequest request)
     {
         var requests = new List<TreatmentRequest>();
 
