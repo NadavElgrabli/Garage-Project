@@ -49,10 +49,10 @@ public class GarageManagementService
         var vehicle = _garageRepository.GetVehicleByLicensePlate(licensePlate);
 
         if (vehicle is null)
-            throw new KeyNotFoundException($"Vehicle with license plate {licensePlate} is not in the garage.");
+            throw new KeyNotFoundException("Vehicle's license plate is not in the garage.");
 
         if (vehicle.Status != Status.Ready)
-            throw new InvalidOperationException($"Vehicle with license plate {licensePlate} is not ready for pickup. Current status: {vehicle.Status}");
+            throw new InvalidOperationException("Vehicle's status isn't ready, so it's not ready for pickup.");
 
         RemoveVehicleFromGarage(vehicle);
 
@@ -74,60 +74,9 @@ public class GarageManagementService
         var requestType = request.GetType();
 
         if (!_vehicleFactories.TryGetValue(requestType, out var factory))
-            throw new InvalidOperationException($"No factory registered for request type {requestType.Name}");
+            throw new InvalidOperationException("No factory registered for request type");
 
         return factory.CreateVehicle(request);
-    }
-
-
-    //TODO: Factory design pattern to create cars
-    private Car CreateElectricCar(AddElectricCarRequest request)
-    {
-        var car = new Car
-        {
-            ManufacturerName = request.ManufacturerName,
-            ModelName = request.ModelName,
-            LicensePlate = request.LicensePlate,
-            RemainingEnergyPercentage = request.RemainingEnergyPercentage,
-            Engine = request.Engine,
-            Owner = request.Owner,
-            Wheels = request.Wheels,
-            Status = Status.Pending,
-            VehicleType = request.VehicleType,
-            TreatmentTypes = request.TreatmentTypes,
-            TreatmentsPrice = request.TreatmentsPrice,
-            NumberOfDoors = request.NumberOfDoors,
-            Color = request.Color
-        };
-        return car;
-    }
-    
-    //TODO: Factory design pattern to create cars
-    private Car CreateFuelCar(AddFuelCarRequest request)
-    {
-        var car = new Car
-        {
-            ManufacturerName = request.ManufacturerName,
-            ModelName = request.ModelName,
-            LicensePlate = request.LicensePlate,
-            RemainingEnergyPercentage = request.RemainingEnergyPercentage,
-            Engine = new FuelEngine
-            {
-                CurrentEnergy = request.Engine.CurrentEnergy,
-                MaxEnergy = request.Engine.MaxEnergy,
-                FuelType = FuelType.Octane95
-            },
-            Owner = request.Owner,
-            Wheels = request.Wheels,
-            Status = Status.Pending,
-            VehicleType = request.VehicleType,
-            TreatmentTypes = request.TreatmentTypes,
-            TreatmentsPrice = request.TreatmentsPrice,
-            NumberOfDoors = request.NumberOfDoors,
-            Color = request.Color
-        };
-
-        return car;
     }
 
     private FuelRequest CreateFuelRequest(Vehicle vehicle, float requestedLiters)
@@ -179,33 +128,12 @@ public class GarageManagementService
         return requests;
     }
     
-    // public Car CreateAndAddElectricCarToGarage(AddElectricCarRequest request)
-    // {
-    //     var car = CreateElectricCar(request);
-    //     AddVehicleToGarage(car);
-    //     return car;
-    // }
-    
-    public Vehicle CreateAndAddElectricCarToGarage(AddElectricCarRequest request)
+    public Vehicle CreateAndAddVehicleToGarage(Vehicle vehicle)
     {
-        var car = CreateVehicle(request);
+        var car = CreateVehicle(vehicle);
         AddVehicleToGarage(car);
         return car;
     }
-    
-    public Vehicle CreateAndAddFuelCarToGarage(AddFuelCarRequest request)
-    {
-        var car = CreateVehicle(request);
-        AddVehicleToGarage(car);
-        return car;
-    }
-    
-    // public Car CreateAndAddFuelCarToGarage(AddFuelCarRequest request)
-    // {
-    //     var car = CreateFuelCar(request);
-    //     AddVehicleToGarage(car);
-    //     return car;
-    // }
     
     public List<TreatmentRequest> GenerateFuelCarTreatmentRequests(Vehicle car, AddFuelCarRequest request)
     {
@@ -219,6 +147,4 @@ public class GarageManagementService
 
         return requests;
     }
-    
-
 }

@@ -2,10 +2,10 @@
 
 public class GarageState
 {
-    public SemaphoreSlim? WorkersSemaphore;
-    public SemaphoreSlim? FuelStationsRequestsSemaphore;
-    public SemaphoreSlim? AirStationsRequestsSemaphore;
-    public SemaphoreSlim? ChargeStationsRequestsSemaphore;
+    public SemaphoreSlim WorkersSemaphore;
+    public SemaphoreSlim FuelStationsRequestsSemaphore;
+    public SemaphoreSlim AirStationsRequestsSemaphore;
+    public SemaphoreSlim ChargeStationsRequestsSemaphore;
     public bool IsInitialized { get; private set; }
 
 

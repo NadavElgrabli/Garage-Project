@@ -16,13 +16,22 @@ public class ListRepository : IListRepository
     
     public void AddVehicleRequestToMatchingList(List<TreatmentRequest> treatmentRequests)
     {
+        //TODO use LINQ (never use for)
         foreach (var request in treatmentRequests)
         {
             var requestType = request.GetType();
+            
+            //TODO: instead of using the dict as handler, create a class that has 2 functions
+            // IsMatching and Handle, then IsMatching function is used to find a match between
+            // the input and the correct handler and return a bool if its matching.
+            // In this case, we will have 3 handlers for each request Type, under a folder called Handlers
+            // We will have a list of all these handlers wherever AddVehicleRequestToMatchingList will be 
+            // since it probably wont stay in ListRepository. 
+            // So basically: we will go over the list of treatmentRequests, then go over each Handler
+            // and use IsMatching to find a match between then and if we found a match use the Handle function
+            // that is relevant.
             if (!_db.RequestTypeToTreatmentType.TryGetValue(requestType, out var treatmentType))
-            {
                 throw new ArgumentException($"Unsupported treatment request type: {requestType.Name}");
-            }
 
             _db.TreatmentLists[treatmentType].AddLast(request);
         }

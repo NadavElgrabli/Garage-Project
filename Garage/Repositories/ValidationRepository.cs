@@ -24,7 +24,7 @@ public class ValidationRepository : IValidationRepository
             errors.Add("Cannot have a refuel treatment for an electric car.");
 
         if (request.Engine.MaxEnergy > 2.8)
-            errors.Add($"Maximum charge is 2.8. Current max charge: {request.Engine.MaxEnergy}.");
+            errors.Add("Maximum charge is above 2.8 which is the maximum.");
 
         if (errors.Any())
             throw new InvalidOperationException("Invalid input:\n- " + string.Join("\n- ", errors));
@@ -43,7 +43,7 @@ public class ValidationRepository : IValidationRepository
             errors.Add("Cannot have a recharge treatment for a fuel car.");
 
         if (request.Engine.MaxEnergy > 50)
-            errors.Add($"Maximum fuel tank capacity is 50. Current value: {request.Engine.MaxEnergy}.");
+            errors.Add("Maximum fuel tank capacity is 50. Current value: is above 50.");
 
         if (errors.Any())
             throw new InvalidOperationException("Invalid input:\n- " + string.Join("\n- ", errors));
@@ -67,7 +67,7 @@ public class ValidationRepository : IValidationRepository
             errors.Add("Engine has too much energy.");
 
         if (request.Wheels.Count != desiredWheelPressures.Count)
-            errors.Add($"Number of wheels: {request.Wheels.Count} does not match desired pressures: {desiredWheelPressures.Count}.");
+            errors.Add("Number of wheels does not match the number of desired wheel pressures.");
 
         if (request.Wheels.Count != 4 || desiredWheelPressures.Count != 4)
         {
@@ -77,10 +77,10 @@ public class ValidationRepository : IValidationRepository
         for (int i = 0; i < request.Wheels.Count; i++)
         {
             if (request.Wheels[i].CurrentPressure > desiredWheelPressures[i])
-                errors.Add($"Wheel {i + 1} current pressure is above the desired pressure.");
+                errors.Add("One of the wheel's current pressure is above the desired pressure.");
 
             if (request.Wheels[i].CurrentPressure > 30)
-                errors.Add($"Wheel {i + 1} current pressure is {request.Wheels[i].CurrentPressure}, which is above the maximum (30).");
+                errors.Add("One of the wheel's current pressure is above the maximum (30).");
         }
     }
 }

@@ -12,6 +12,7 @@ using Xunit;
 public class ListRepositoryTests
 {
     [Fact]
+    //TODO: fix function name
     public void FindFirstAvailableVehicleRequest_ShouldReturnFirstNotInTreatment()
     {
         // Arrange
@@ -31,6 +32,7 @@ public class ListRepositoryTests
         list.AddLast(request2); // Should be skipped
         list.AddLast(request3);
 
+        //TODO: use dependency injection instead of creating "new" classes
         var db = new InMemoryDatabase();
         db.TreatmentLists[TreatmentType.Recharge] = list;
         

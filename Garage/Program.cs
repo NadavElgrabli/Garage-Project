@@ -21,8 +21,8 @@ builder.Services.AddSingleton<ValidationService>();
 builder.Services.AddSingleton<GarageOrchestratorService>();
 builder.Services.AddSingleton<GarageState>();
 builder.Services.AddSingleton<InMemoryDatabase>();
-builder.Services.AddTransient<ElectricCarFactory>();
-builder.Services.AddTransient<FuelCarFactory>();
+builder.Services.AddSingleton<ElectricCarFactory>();
+builder.Services.AddSingleton<FuelCarFactory>();
 builder.Services.AddSingleton(provider => new Dictionary<Type, IVehicleFactory>
 {
     { typeof(AddElectricCarRequest), provider.GetRequiredService<ElectricCarFactory>() },

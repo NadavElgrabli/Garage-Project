@@ -39,7 +39,7 @@ public class GarageOrchestratorService
     public async Task AddElectricCar(AddElectricCarRequest request)
     {
         await _validationService.CheckValidElectricCarInput(request);
-        var car = _garageManagementService.CreateAndAddElectricCarToGarage(request);
+        var car = _garageManagementService.CreateAndAddVehicleToGarage(request);
         var treatmentRequests = _garageManagementService.GenerateElectricCarTreatmentRequests(car, request);
         _listProcessorService.AddVehicleRequestsToMatchingList(treatmentRequests);
     }
@@ -47,7 +47,7 @@ public class GarageOrchestratorService
     public async Task AddFuelCar(AddFuelCarRequest request)
     {
         await _validationService.CheckValidFuelCarInput(request);
-        var car = _garageManagementService.CreateAndAddFuelCarToGarage(request);
+        var car = _garageManagementService.CreateAndAddVehicleToGarage(request);
         var treatmentRequests = _garageManagementService.GenerateFuelCarTreatmentRequests(car, request);
         _listProcessorService.AddVehicleRequestsToMatchingList(treatmentRequests);
     }

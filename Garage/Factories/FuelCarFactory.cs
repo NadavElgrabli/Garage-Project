@@ -10,7 +10,7 @@ public class FuelCarFactory : IVehicleFactory
         var fuelCarRequest = request as AddFuelCarRequest
                               ?? throw new ArgumentException("Invalid request type");
 
-        return new Car
+        var car =  new Car
         {
             ManufacturerName = fuelCarRequest.ManufacturerName,
             ModelName = fuelCarRequest.ModelName,
@@ -31,5 +31,7 @@ public class FuelCarFactory : IVehicleFactory
             NumberOfDoors = fuelCarRequest.NumberOfDoors,
             Color = fuelCarRequest.Color
         };
+
+        return car;
     }
 }

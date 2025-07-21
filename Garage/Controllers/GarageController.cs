@@ -5,12 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Garage.Controllers;
 //TODO:
-// 1) create orchestrator service for controller + separate function "register vehicle" - done
-// 2) Factory design pattern to create cars (garageManagementService) - done (check program.cs)
-// 3) ListProcessorServiceTests: add a test for a vehicle that cuts in line - done
-// 4) ListRepository:  use handlers - done
-// 5) remove from GarageState static fields - done
-// 6) remove all static from InMemoryDatabase - done
+// 1) Factory design pattern to create cars (garageManagementService) - done (check program.cs)
+// 2) ListRepository:  use handlers
+// 3) Garage state - check what to do with the nulls
+// 4) In all exceptions (validation repository and GarageManagementService) dont use parameters
+// in the exceptions you throw, use exception params instead. - done
+// 5) InMemoryDatabase - dont use types as keys, and only keep their actual databases.
+// 6) In the tests, use DP for InMemoryDatabase instead of creating a new class.
 [ApiController]
 [Route("api/[controller]")]
 public class GarageController : ControllerBase
@@ -26,6 +27,7 @@ public class GarageController : ControllerBase
     public IActionResult InitializeGarage([FromBody] GarageInit init)
     {
         _garageOrchestratorService.InitializeGarage(init);
+        
         return Ok("Garage initialized successfully");
     }
 
@@ -34,6 +36,7 @@ public class GarageController : ControllerBase
     public IActionResult GetVehiclesByStatus([FromQuery] Status status)
     {
         var vehicles = _garageOrchestratorService.GetVehiclesByStatus(status);
+        
         return Ok(vehicles);
     }
     
@@ -41,6 +44,7 @@ public class GarageController : ControllerBase
     public IActionResult GetVehicleByLicensePlate([FromQuery] string licensePlate)
     {
         var vehicle = _garageOrchestratorService.GetVehicleByLicensePlate(licensePlate);
+        
         return Ok(vehicle);
     }
 
@@ -49,6 +53,7 @@ public class GarageController : ControllerBase
     public IActionResult PickUpVehicleFromGarage([FromQuery] string licensePlate)
     {
         var vehicle = _garageOrchestratorService.PickUpVehicle(licensePlate);
+        
         return Ok(vehicle);
     }
     
@@ -56,6 +61,7 @@ public class GarageController : ControllerBase
     public async Task<IActionResult> AddElectricCar([FromBody] AddElectricCarRequest request)
     {
         await _garageOrchestratorService.AddElectricCar(request);
+        
         return Ok("Electric car added successfully");
     }
     
@@ -64,6 +70,7 @@ public class GarageController : ControllerBase
     public async Task<IActionResult> AddFuelCar([FromBody] AddFuelCarRequest request)
     {
         await  _garageOrchestratorService.AddFuelCar(request);
+        
         return Ok("Fuel car added successfully");
     }
 }
