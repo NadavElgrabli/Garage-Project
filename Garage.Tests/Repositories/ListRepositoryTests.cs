@@ -12,8 +12,7 @@ using Xunit;
 public class ListRepositoryTests
 {
     [Fact]
-    //TODO: fix function name
-    public void FindFirstAvailableVehicleRequest_ShouldReturnFirstNotInTreatment()
+    public void FindFirstAvailableVehicleRequest_ShouldReturnThirdRequest_WhenFirstTwoAreInTreatment()
     {
         // Arrange
         var treatmentService = new Mock<ITreatmentService>();

@@ -5,13 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Garage.Controllers;
 //TODO:
-// 1) Factory design pattern to create cars (garageManagementService) - done (check program.cs)
+// 1) Factory design pattern (check program.cs)
 // 2) ListRepository:  use handlers
-// 3) Garage state - check what to do with the nulls
+// 3) Garage state, check what to do with the nulls - done
 // 4) In all exceptions (validation repository and GarageManagementService) dont use parameters
 // in the exceptions you throw, use exception params instead. - done
-// 5) InMemoryDatabase - dont use types as keys, and only keep their actual databases.
-// 6) In the tests, use DP for InMemoryDatabase instead of creating a new class.
+// 5) InMemoryDatabase - dont use types as keys, and only keep there the actual databases.
+// 6) In the tests, use DP for InMemoryDatabase instead of creating a new class - Need to create 
+// a new interface just for InMEmoryDatabase in order to mock it?
 [ApiController]
 [Route("api/[controller]")]
 public class GarageController : ControllerBase
