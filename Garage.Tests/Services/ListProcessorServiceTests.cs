@@ -1,5 +1,6 @@
 ﻿using Garage.Data;
 using Garage.Enums;
+using Garage.Handlers;
 using Garage.Models;
 using Garage.Repositories;
 using Garage.Services;
@@ -46,7 +47,8 @@ public class ListProcessorServiceTests
         var service = new ListProcessorService(
             new[] { mockTreatmentService.Object },
             mockListRepository.Object,
-            db 
+            db,
+            Enumerable.Empty<ITreatmentRequestHandler>()
         );
         // Act
         // We'll run the method for a short time and let it process once
@@ -99,7 +101,8 @@ public class ListProcessorServiceTests
         var service = new ListProcessorService(
             new[] { mockTreatmentService.Object },
             mockListRepository.Object,
-            db);
+            db,
+            Enumerable.Empty<ITreatmentRequestHandler>());
 
         // Act
         var task = Task.Run(async () => await service.ProcessTreatmentListAsync(mockTreatmentService.Object));
@@ -131,7 +134,8 @@ public class ListProcessorServiceTests
         var service = new ListProcessorService(
             new[] { mockTreatmentService.Object },
             mockListRepository.Object,
-            db);
+            db,
+            Enumerable.Empty<ITreatmentRequestHandler>());
 
         // Act
         var task = Task.Run(async () => await service.ProcessTreatmentListAsync(mockTreatmentService.Object));

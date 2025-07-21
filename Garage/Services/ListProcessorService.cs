@@ -1,4 +1,5 @@
 ﻿using Garage.Data;
+using Garage.Handlers;
 using Garage.Models;
 using Garage.Repositories;
 
@@ -9,15 +10,19 @@ public class ListProcessorService
     private readonly IEnumerable<ITreatmentService> _treatmentServices;
     private readonly IListRepository _listRepository;
     private readonly InMemoryDatabase _db;
+    private readonly IEnumerable<ITreatmentRequestHandler> _handlers;
+
     
     public ListProcessorService(
         IEnumerable<ITreatmentService> treatmentServices,
         IListRepository listRepository,
-        InMemoryDatabase db)
+        InMemoryDatabase db,
+        IEnumerable<ITreatmentRequestHandler> handlers)
     {
         _treatmentServices = treatmentServices;
         _listRepository = listRepository;
         _db = db;
+        _handlers = handlers;
     }
     
     public async Task StartProcessingAsync()
@@ -31,8 +36,16 @@ public class ListProcessorService
     
     public void AddVehicleRequestsToMatchingList(List<TreatmentRequest> treatmentRequests)
     {
-        _listRepository.AddVehicleRequestToMatchingList(treatmentRequests);
+        foreach (var request in treatmentRequests)
+        {
+            var handler = _handlers.FirstOrDefault(h => h.IsMatching(request));
+            if (handler == null)
+                throw new ArgumentException("Unsupported treatment request type.");
+
+            handler.Handle(request, _db);
+        }
     }
+
     
     public async Task ProcessTreatmentListAsync(ITreatmentService treatmentService)
     {

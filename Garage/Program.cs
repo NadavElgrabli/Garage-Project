@@ -1,5 +1,6 @@
 using Garage.Data;
 using Garage.Factories;
+using Garage.Handlers;
 using Garage.Middlewares;
 using Garage.Models;
 using Garage.Repositories;
@@ -12,6 +13,9 @@ builder.Services.AddControllers();
 builder.Services.AddSingleton<ITreatmentService, RefuelService>();
 builder.Services.AddSingleton<ITreatmentService, RechargeService>();
 builder.Services.AddSingleton<ITreatmentService, InflateService>();
+builder.Services.AddSingleton<ITreatmentRequestHandler, FuelRequestHandler>();
+builder.Services.AddSingleton<ITreatmentRequestHandler, AirRequestHandler>();
+builder.Services.AddSingleton<ITreatmentRequestHandler, ChargeRequestHandler>();
 builder.Services.AddSingleton<IGarageRepository, GarageRepository>();
 builder.Services.AddSingleton<GarageManagementService>();
 builder.Services.AddSingleton<IListRepository, ListRepository>();
