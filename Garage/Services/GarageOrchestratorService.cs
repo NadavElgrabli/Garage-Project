@@ -36,17 +36,17 @@ public class GarageOrchestratorService
         return _garageManagementService.PickUpVehicle(licensePlate);
     }
 
-    public async Task AddElectricCar(AddElectricCarRequest request)
+    public void AddElectricCar(AddElectricCarRequest request)
     {
-        await _validationService.CheckValidElectricCarInput(request);
+        _validationService.CheckValidElectricCarInput(request);
         var car = _garageManagementService.CreateAndAddVehicleToGarage(request);
         var treatmentRequests = _garageManagementService.GenerateElectricCarTreatmentRequests(car, request);
         _listProcessorService.AddVehicleRequestsToMatchingList(treatmentRequests);
     }
 
-    public async Task AddFuelCar(AddFuelCarRequest request)
+    public void AddFuelCar(AddFuelCarRequest request)
     {
-        await _validationService.CheckValidFuelCarInput(request);
+        _validationService.CheckValidFuelCarInput(request);
         var car = _garageManagementService.CreateAndAddVehicleToGarage(request);
         var treatmentRequests = _garageManagementService.GenerateFuelCarTreatmentRequests(car, request);
         _listProcessorService.AddVehicleRequestsToMatchingList(treatmentRequests);

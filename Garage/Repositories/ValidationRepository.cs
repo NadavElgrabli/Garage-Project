@@ -14,7 +14,7 @@ public class ValidationRepository : IValidationRepository
         _garageState  = garageState;
         _db = db;
     }
-    public Task CheckValidElectricCarInput(AddElectricCarRequest request)
+    public void CheckValidElectricCarInput(AddElectricCarRequest request)
     {
         var errors = new List<string>();
 
@@ -28,12 +28,10 @@ public class ValidationRepository : IValidationRepository
 
         if (errors.Any())
             throw new InvalidOperationException("Invalid input:\n- " + string.Join("\n- ", errors));
-
-        return Task.CompletedTask;
     }
 
 
-    public Task CheckValidFuelCarInput(AddFuelCarRequest request)
+    public void CheckValidFuelCarInput(AddFuelCarRequest request)
     {
         var errors = new List<string>();
 
@@ -47,8 +45,6 @@ public class ValidationRepository : IValidationRepository
 
         if (errors.Any())
             throw new InvalidOperationException("Invalid input:\n- " + string.Join("\n- ", errors));
-
-        return Task.CompletedTask;
     }
 
     

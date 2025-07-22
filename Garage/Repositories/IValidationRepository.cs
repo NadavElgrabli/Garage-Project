@@ -4,6 +4,6 @@ namespace Garage.Repositories;
 
 public interface IValidationRepository
 {
-    Task CheckValidElectricCarInput(AddElectricCarRequest request);
-    Task CheckValidFuelCarInput(AddFuelCarRequest request);
+    void CheckValidElectricCarInput(AddElectricCarRequest request);
+    void CheckValidFuelCarInput(AddFuelCarRequest request);
 }

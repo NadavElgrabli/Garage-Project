@@ -12,13 +12,13 @@ public class ValidationService
         _validationRepository = validationRepository;
     }
     
-    public Task CheckValidElectricCarInput(AddElectricCarRequest request)
+    public void CheckValidElectricCarInput(AddElectricCarRequest request)
     {
-        return _validationRepository.CheckValidElectricCarInput(request);
+        _validationRepository.CheckValidElectricCarInput(request);
     }
     
-    public Task CheckValidFuelCarInput(AddFuelCarRequest request)
-    {
-        return _validationRepository.CheckValidFuelCarInput(request);
+    public void CheckValidFuelCarInput(AddFuelCarRequest request)
+    { 
+        _validationRepository.CheckValidFuelCarInput(request);
     }
 }
