@@ -21,4 +21,9 @@ public class ValidationService
     { 
         _validationRepository.CheckValidFuelCarInput(request);
     }
+
+    public void CheckValidTruckInput(AddTruckRequest request)
+    {
+        
+    }
 }

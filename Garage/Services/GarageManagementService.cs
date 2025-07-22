@@ -10,6 +10,8 @@ public class GarageManagementService
 {
     private readonly IGarageRepository _garageRepository;
     private readonly GarageState _garageState;
+    
+    //TODO: Type not as key
     private readonly Dictionary<Type, IVehicleFactory> _vehicleFactories;
     
     public GarageManagementService(
@@ -69,6 +71,7 @@ public class GarageManagementService
         return vehicle;
     }
     
+    //TODO: instead of dict use handler pattern
     private Vehicle CreateVehicle(Vehicle request)
     {
         var requestType = request.GetType();
@@ -132,9 +135,9 @@ public class GarageManagementService
     
     public Vehicle CreateAndAddVehicleToGarage(Vehicle vehicle)
     {
-        var car = CreateVehicle(vehicle);
-        AddVehicleToGarage(car);
-        return car;
+        var v = CreateVehicle(vehicle);
+        AddVehicleToGarage(v);
+        return v;
     }
     
     public List<TreatmentRequest> GenerateFuelCarTreatmentRequests(Vehicle car, AddFuelCarRequest request)

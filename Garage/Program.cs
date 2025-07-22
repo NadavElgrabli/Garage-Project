@@ -27,10 +27,13 @@ builder.Services.AddSingleton<GarageState>();
 builder.Services.AddSingleton<InMemoryDatabase>();
 builder.Services.AddSingleton<ElectricCarFactory>();
 builder.Services.AddSingleton<FuelCarFactory>();
+builder.Services.AddSingleton<TruckFactory>();
+
 builder.Services.AddSingleton(provider => new Dictionary<Type, IVehicleFactory>
 {
     { typeof(AddElectricCarRequest), provider.GetRequiredService<ElectricCarFactory>() },
-    { typeof(AddFuelCarRequest), provider.GetRequiredService<FuelCarFactory>() }
+    { typeof(AddFuelCarRequest), provider.GetRequiredService<FuelCarFactory>() },
+    {typeof(AddTruckRequest), provider.GetRequiredService<TruckFactory>() }
 });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

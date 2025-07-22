@@ -6,8 +6,11 @@ namespace Garage.Handlers;
 
 public class AirRequestHandler : ITreatmentRequestHandler
 {
+    //TODO: instead of receiving db use DI
     public bool IsMatching(TreatmentRequest request)
     {
+        // TODO: put in var and then return
+        
         return request is AirRequest;
     }
 

@@ -2,6 +2,6 @@
 
 public class Truck : Vehicle
 {
+    public bool CarryDangerousSubstances {get; set;}
     public float CargoVolume {get; set;}
-    public bool CarriesHazardousMaterials {get; set;}
 }
