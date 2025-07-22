@@ -2,15 +2,25 @@
 using Garage.Enums;
 using Garage.Models;
 using Garage.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace Garage.Tests.Services;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Xunit;
-
 
 public class RechargeServiceTests
 {
+    private IConfiguration GetTestConfiguration()
+    {
+        var inMemorySettings = new Dictionary<string, string> {
+            {"Recharge:PricePerHour", "10"},
+            {"Recharge:OverchargePenalty", "1500"},
+            {"Recharge:MillisecondsPerHour", "10000"},
+        };
+
+        return new ConfigurationBuilder()
+            .AddInMemoryCollection(inMemorySettings)
+            .Build();
+    }
+
     [Fact]
     public async Task TreatAsync_ShouldRechargeVehicleFully_WhenVehicleIsNotFullyCharged()
     {
@@ -29,20 +39,21 @@ public class RechargeServiceTests
         };
 
         var garageState = new GarageState();
-        garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
-        var service = new RechargeService(garageState);
+        garageState.Initialize(1, 1, 1, 1);
+        var config = GetTestConfiguration();
+
+        var service = new RechargeService(garageState, config);
 
         // Act
         await service.TreatAsync(vehicle, request);
 
         // Assert
-        Assert.Equal(40, vehicle.TreatmentsPrice); // 4 hours * 10
-        Assert.Equal(vehicle.Engine.MaxEnergy, vehicle.Engine.CurrentEnergy); //fully charged
-        Assert.DoesNotContain(TreatmentType.Recharge, vehicle.TreatmentTypes); // removed treatment from list
-        Assert.Equal(Status.Ready, vehicle.Status); // changed status to ready
+        Assert.Equal(40, vehicle.TreatmentsPrice);
+        Assert.Equal(vehicle.Engine.MaxEnergy, vehicle.Engine.CurrentEnergy);
+        Assert.DoesNotContain(TreatmentType.Recharge, vehicle.TreatmentTypes);
+        Assert.Equal(Status.Ready, vehicle.Status);
     }
-    
-    
+
     [Fact]
     public async Task TreatAsync_ShouldOverChargeVehicle_WhenVehicleIsNotFullyCharged()
     {
@@ -57,12 +68,14 @@ public class RechargeServiceTests
         var request = new ChargeRequest
         {
             Vehicle = vehicle,
-            RequestedHoursToCharge = 10 // clearly overcharging (10 > 3 left)
+            RequestedHoursToCharge = 10
         };
 
         var garageState = new GarageState();
-        garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
-        var service = new RechargeService(garageState);
+        garageState.Initialize(1, 1, 1, 1);
+        var config = GetTestConfiguration();
+
+        var service = new RechargeService(garageState, config);
 
         // Act
         await service.TreatAsync(vehicle, request);
@@ -70,9 +83,9 @@ public class RechargeServiceTests
         // Assert
         Assert.True(vehicle.Engine.CurrentEnergy <= vehicle.Engine.MaxEnergy, "Engine should not exceed max energy");
         Assert.True(vehicle.Engine.CurrentEnergy >= 2, "Engine should be at least the original energy");
-        Assert.Equal(3 * 10 + 1500, vehicle.TreatmentsPrice); // base price + overflow penalty
-        Assert.DoesNotContain(TreatmentType.Recharge, vehicle.TreatmentTypes); // treatment removed
-        Assert.Equal(Status.Ready, vehicle.Status); // no more treatments left
+        Assert.Equal(3 * 10 + 1500, vehicle.TreatmentsPrice);
+        Assert.DoesNotContain(TreatmentType.Recharge, vehicle.TreatmentTypes);
+        Assert.Equal(Status.Ready, vehicle.Status);
     }
 
     [Fact]
@@ -89,20 +102,22 @@ public class RechargeServiceTests
         var request = new ChargeRequest
         {
             Vehicle = vehicle,
-            RequestedHoursToCharge = 5 // Partial charge: 2 + 5 = 7 < 10
+            RequestedHoursToCharge = 5
         };
 
         var garageState = new GarageState();
-        garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
-        var service = new RechargeService(garageState);
+        garageState.Initialize(1, 1, 1, 1);
+        var config = GetTestConfiguration();
+
+        var service = new RechargeService(garageState, config);
 
         // Act
         await service.TreatAsync(vehicle, request);
 
         // Assert
-        Assert.Equal(7, vehicle.Engine.CurrentEnergy); // 2 + 5
-        Assert.Equal(50, vehicle.TreatmentsPrice); // 5 hours * 10
+        Assert.Equal(7, vehicle.Engine.CurrentEnergy);
+        Assert.Equal(50, vehicle.TreatmentsPrice);
         Assert.DoesNotContain(TreatmentType.Recharge, vehicle.TreatmentTypes);
-        Assert.Equal(Status.Ready, vehicle.Status); // No treatments left
+        Assert.Equal(Status.Ready, vehicle.Status);
     }
 }

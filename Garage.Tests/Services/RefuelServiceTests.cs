@@ -2,6 +2,7 @@
 using Garage.Enums;
 using Garage.Models;
 using Garage.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace Garage.Tests.Services;
 
@@ -26,7 +27,20 @@ public class RefuelServiceTests
         
         var garageState = new GarageState();
         garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
-        var service = new RefuelService(garageState);
+        //var service = new RefuelService(garageState);
+        
+        var inMemorySettings = new Dictionary<string, string>
+        {
+            { "Refuel:FuelPricePerLiter", "5" },
+            { "Refuel:SpillCleanupCost", "10" },
+            { "Refuel:MillisecondsPerLiter", "1" }
+        };
+
+        IConfiguration config = new ConfigurationBuilder()
+            .AddInMemoryCollection(inMemorySettings)
+            .Build();
+
+        var service = new RefuelService(garageState, config);
         
         //Act
         await service.TreatAsync(vehicle, request);
@@ -57,8 +71,17 @@ public class RefuelServiceTests
 
         var garageState = new GarageState();
         garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
-        var service = new RefuelService(garageState);
 
+        var inMemorySettings = new Dictionary<string, string>
+        {
+            { "Refuel:FuelPricePerLiter", "5" },
+            { "Refuel:SpillCleanupCost", "25" },
+            { "Refuel:MillisecondsPerLiter", "1" }
+        };
+        IConfiguration config = new ConfigurationBuilder().AddInMemoryCollection(inMemorySettings).Build();
+
+        var service = new RefuelService(garageState, config);
+        
         // Act
         await service.TreatAsync(vehicle, request);
 
@@ -88,8 +111,17 @@ public class RefuelServiceTests
 
         var garageState = new GarageState();
         garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
-        var service = new RefuelService(garageState);
+        
+        var inMemorySettings = new Dictionary<string, string>
+        {
+            { "Refuel:FuelPricePerLiter", "5" },
+            { "Refuel:SpillCleanupCost", "25" },
+            { "Refuel:MillisecondsPerLiter", "1" }
+        };
+        IConfiguration config = new ConfigurationBuilder().AddInMemoryCollection(inMemorySettings).Build();
 
+        var service = new RefuelService(garageState, config);
+        
         // Act
         await service.TreatAsync(vehicle, request);
 

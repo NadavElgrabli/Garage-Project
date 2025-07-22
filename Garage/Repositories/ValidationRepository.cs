@@ -9,10 +9,30 @@ public class ValidationRepository : IValidationRepository
     private readonly GarageState _garageState;
     private readonly InMemoryDatabase _db;
 
-    public ValidationRepository(GarageState garageState,  InMemoryDatabase db)
+    private readonly float _maxElectricCarEnergy;
+    private readonly float _maxFuelCarEnergy;
+    private readonly float _maxTruckEnergy;
+    private readonly int _minTreatments;
+    private readonly int _maxTreatments;
+    private readonly int _numberOfCarWheels;
+    private readonly int _numberOfTruckWheels;
+    private readonly float _carWheelMaxPressure;
+    private readonly float _truckWheelMaxPressure;
+
+    public ValidationRepository(GarageState garageState,  InMemoryDatabase db, IConfiguration  config)
     {
         _garageState  = garageState;
         _db = db;
+
+        _maxElectricCarEnergy = config.GetValue<float>("Validation:MaxElectricCarEnergy");
+        _maxFuelCarEnergy = config.GetValue<float>("Validation:MaxFuelCarEnergy");
+        _maxTruckEnergy = config.GetValue<float>("Validation:MaxTruckEnergy");
+        _minTreatments = config.GetValue<int>("Validation:MinimumNumberOfTreatments");
+        _maxTreatments = config.GetValue<int>("Validation:MaximumNumberOfTreatments");
+        _numberOfCarWheels = config.GetValue<int>("Validation:NumberOfCarWheels");
+        _numberOfTruckWheels = config.GetValue<int>("Validation:NumberOfTruckWheels");
+        _carWheelMaxPressure = config.GetValue<float>("Validation:CarWheelMaxPressure");
+        _truckWheelMaxPressure = config.GetValue<float>("Validation:TruckWheelMaxPressure");
     }
     
     public void CheckValidElectricCarInput(AddElectricCarRequest request)
@@ -26,7 +46,7 @@ public class ValidationRepository : IValidationRepository
         if (request.TreatmentTypes.Contains(TreatmentType.Refuel))
             errors.Add("Cannot have a refuel treatment for an electric car.");
 
-        if (request.Engine.MaxEnergy > 2.8)
+        if (request.Engine.MaxEnergy > _maxElectricCarEnergy)
         {
             errors.Add("Maximum charge is above 2.8 which is the maximum.");
             errorData["CurrentElectricCarMaxEnergy"] = request.Engine.MaxEnergy;
@@ -55,9 +75,9 @@ public class ValidationRepository : IValidationRepository
         if (request.TreatmentTypes.Contains(TreatmentType.Recharge))
             errors.Add("Cannot have a recharge treatment for a fuel car.");
 
-        if (request.Engine.MaxEnergy > 50)
+        if (request.Engine.MaxEnergy > _maxFuelCarEnergy)
         {
-            errors.Add("Maximum fuel tank capacity is 50. Current maximum value is above 50.");
+            errors.Add("Maximum fuel tank capacity above 50 which is the maximum.");
             errorData["CurrentFuelCarMaxEnergy"] = request.Engine.MaxEnergy;
         }
 
@@ -83,7 +103,8 @@ public class ValidationRepository : IValidationRepository
         if (_db.Vehicles.ContainsKey(request.LicensePlate))
             errors.Add("Car already in garage.");
 
-        if (request.TreatmentTypes.Count is > 2 or < 1)
+        if (request.TreatmentTypes.Count > _maxTreatments ||
+            request.TreatmentTypes.Count < _minTreatments)
             errors.Add("Number of treatments must be either 1 or 2.");
 
         if (request.Engine.CurrentEnergy > request.Engine.MaxEnergy)
@@ -98,7 +119,9 @@ public class ValidationRepository : IValidationRepository
         if (request.Wheels.Count != desiredWheelPressures.Count)
             errors.Add("Number of wheels does not match the number of desired wheel pressures.");
 
-        if (request.Wheels.Count != 4 || desiredWheelPressures.Count != 4)
+
+        if (request.Wheels.Count != _numberOfCarWheels ||
+            desiredWheelPressures.Count != _numberOfCarWheels)
             errors.Add("Number of wheels for cars must equal 4, and the desired pressures must contain 4 pressures.");
 
         for (int i = 0; i < request.Wheels.Count; i++)
@@ -111,8 +134,8 @@ public class ValidationRepository : IValidationRepository
                 errors.Add($"Wheel at index {i} has current pressure above desired pressure.");
                 errorData[$"Wheel[{i}].CurrentPressureVsDesired"] = new { Current = current, Desired = desired };
             }
-
-            if (current > 30)
+            
+            if (current > _carWheelMaxPressure)
             {
                 errors.Add($"Wheel at index {i} has current pressure above the maximum (30).");
                 errorData[$"Wheel[{i}].CurrentPressure"] = current;
@@ -129,8 +152,9 @@ public class ValidationRepository : IValidationRepository
 
         if (request.Wheels.Count != request.DesiredWheelPressures.Count)
             errors.Add("Number of wheels does not match the number of desired wheel pressures.");
-
-        if (request.Wheels.Count != 16 || request.DesiredWheelPressures.Count != 16)
+        
+        if (request.Wheels.Count != _numberOfTruckWheels ||
+            request.DesiredWheelPressures.Count != _numberOfTruckWheels)
             errors.Add("Number of wheels for trucks must equal 16, and the desired pressures must contain 16 pressures.");
 
         for (int i = 0; i < request.Wheels.Count; i++)
@@ -141,8 +165,8 @@ public class ValidationRepository : IValidationRepository
                 errorData[$"Wheel_{i}_CurrentPressure"] = request.Wheels[i].CurrentPressure;
                 errorData[$"Wheel_{i}_DesiredPressure"] = request.DesiredWheelPressures[i];
             }
-
-            if (request.Wheels[i].CurrentPressure > 26)
+            
+            if (request.Wheels[i].CurrentPressure > _truckWheelMaxPressure)
             {
                 errors.Add($"Wheel {i}: current pressure is above the maximum allowed (26).");
                 errorData[$"Wheel_{i}_Pressure_Too_High"] = request.Wheels[i].CurrentPressure;
@@ -151,8 +175,8 @@ public class ValidationRepository : IValidationRepository
 
         if (request.TreatmentTypes.Contains(TreatmentType.Recharge))
             errors.Add("Cannot have a recharge treatment for a truck.");
-
-        if (request.Engine.MaxEnergy > 110)
+        
+        if (request.Engine.MaxEnergy > _maxTruckEnergy)
         {
             errors.Add("Maximum fuel tank capacity is 110. Current value is above that.");
             errorData["TruckEngineMaxEnergy"] = request.Engine.MaxEnergy;

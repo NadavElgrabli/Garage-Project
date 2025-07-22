@@ -7,10 +7,16 @@ namespace Garage.Services;
 public class InflateService : ITreatmentService
 {
     private readonly GarageState _garageState;
+    private readonly int _delayPerPressureUnitInMilliseconds;
+    private readonly float _explosionPenalty;
+    private readonly float _pricePerPressureUnit;
 
-    public InflateService(GarageState garageState)
+    public InflateService(GarageState garageState, IConfiguration config)
     {
         _garageState = garageState;
+        _delayPerPressureUnitInMilliseconds = config.GetValue<int>("Inflate:DelayPerPressureUnitInMilliseconds");
+        _explosionPenalty = config.GetValue<float>("Inflate:ExplosionPenalty");
+        _pricePerPressureUnit = config.GetValue<float>("Inflate:PricePerPressureUnit");
     }
     
     public async Task TreatAsync(Vehicle vehicle, TreatmentRequest request)
@@ -36,24 +42,23 @@ public class InflateService : ITreatmentService
                 // Wheel exploded from over pressure, e.g: target is 10, current is 2, max pressure is 8
                 if (target > wheel.MaxPressure)
                 {
-                    await Task.Delay((int)(wheel.MaxPressure - wheel.CurrentPressure) * 500);
+                    await Task.Delay((int)(wheel.MaxPressure - wheel.CurrentPressure) * _delayPerPressureUnitInMilliseconds);
                     wheel.CurrentPressure = 0;
-                    totalPrice += 350;
+                    totalPrice += _explosionPenalty;
                 }
                 //current pressure is 2, max pressure is 8, target is 8 or lower
                 else
                 {
                     float pressureToAdd = MathF.Max(0, target - wheel.CurrentPressure);
-                    await Task.Delay((int)pressureToAdd * 500);
+                    await Task.Delay((int)pressureToAdd * _delayPerPressureUnitInMilliseconds);
                     wheel.CurrentPressure += pressureToAdd;
-                    totalPrice += pressureToAdd * 0.1f;
+                    totalPrice += pressureToAdd * _pricePerPressureUnit;
                 }
             }
 
             vehicle.TreatmentsPrice += totalPrice;
             vehicle.TreatmentTypes.Remove(TreatmentType.Inflate);
             vehicle.Status = vehicle.TreatmentTypes.Count == 0 ? Status.Ready : Status.Pending;
-
         }
         finally
         {
@@ -64,6 +69,8 @@ public class InflateService : ITreatmentService
 
     public TreatmentType GetTreatmentType()
     {
-        return TreatmentType.Inflate;
+        var treatmentType = TreatmentType.Inflate;
+        
+        return treatmentType;
     }
 }

@@ -2,13 +2,26 @@
 using Garage.Enums;
 using Garage.Models;
 using Garage.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace Garage.Tests.Services;
 
-using System.Threading.Tasks;
-using Xunit;
 public class InflateServiceTests
 {
+    private IConfiguration CreateInflateTestConfig()
+    {
+        var inMemorySettings = new Dictionary<string, string>
+        {
+            {"Inflate:DelayPerPressureUnitInMilliseconds", "500"}, 
+            {"Inflate:ExplosionPenalty", "350"},
+            {"Inflate:PricePerPressureUnit", "0.1"}
+        };
+
+        return new ConfigurationBuilder()
+            .AddInMemoryCollection(inMemorySettings)
+            .Build();
+    }
+    
     [Fact]
     public async Task TreatAsync_ShouldInflateWheelsFully()
     {
@@ -38,7 +51,9 @@ public class InflateServiceTests
 
         var garageState = new GarageState();
         garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
-        var service = new InflateService(garageState);
+        //var service = new InflateService(garageState);
+        var config = CreateInflateTestConfig();
+        var service = new InflateService(garageState, config);
 
         // Act
         await service.TreatAsync(vehicle, request);
@@ -85,7 +100,9 @@ public class InflateServiceTests
 
         var garageState = new GarageState();
         garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
-        var service = new InflateService(garageState);
+        //var service = new InflateService(garageState);
+        var config = CreateInflateTestConfig();
+        var service = new InflateService(garageState, config);
 
         // Act
         await service.TreatAsync(vehicle, request);
@@ -136,7 +153,9 @@ public class InflateServiceTests
 
         var garageState = new GarageState();
         garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
-        var service = new InflateService(garageState);
+        //var service = new InflateService(garageState);
+        var config = CreateInflateTestConfig();
+        var service = new InflateService(garageState, config);
 
         // Act
         await service.TreatAsync(vehicle, request);
@@ -182,7 +201,9 @@ public class InflateServiceTests
 
         var garageState = new GarageState();
         garageState.Initialize(1, 1, 1, 1); // initialize with 1 worker and 1 of each station
-        var service = new InflateService(garageState);
+        //var service = new InflateService(garageState);
+        var config = CreateInflateTestConfig();
+        var service = new InflateService(garageState, config);
 
         // Act
         await service.TreatAsync(vehicle, request);
@@ -199,7 +220,4 @@ public class InflateServiceTests
         Assert.DoesNotContain(TreatmentType.Inflate, vehicle.TreatmentTypes);
         Assert.Equal(Status.Ready, vehicle.Status);
     }
-
-
-
 }

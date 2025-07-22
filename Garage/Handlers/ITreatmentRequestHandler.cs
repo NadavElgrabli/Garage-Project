@@ -1,5 +1,4 @@
-﻿using Garage.Data;
-using Garage.Models;
+﻿using Garage.Models;
 
 namespace Garage.Handlers;
 

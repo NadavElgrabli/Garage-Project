@@ -7,10 +7,17 @@ namespace Garage.Services;
 public class RefuelService : ITreatmentService
 {
     private readonly GarageState _garageState;
+    private readonly float _fuelPricePerLiter;
+    private readonly float _spillCleanupCost;
+    private readonly int _millisecondsPerLiter;
 
-    public RefuelService(GarageState garageState)
+    public RefuelService(GarageState garageState, IConfiguration config)
     {
         _garageState = garageState;
+        
+        _fuelPricePerLiter = config.GetValue<float>("Refuel:FuelPricePerLiter");
+        _spillCleanupCost = config.GetValue<float>("Refuel:SpillCleanupCost");
+        _millisecondsPerLiter = config.GetValue<int>("Refuel:MillisecondsPerLiter");
     }
     
     public async Task TreatAsync(Vehicle vehicle, TreatmentRequest request)
@@ -27,21 +34,21 @@ public class RefuelService : ITreatmentService
         {
             vehicle.Status = Status.InTreatment;
             float missingFuelAmount = vehicle.Engine.MaxEnergy - vehicle.Engine.CurrentEnergy;
-            float totalPrice = litersToFuel * 5;
+            float totalPrice = litersToFuel * _fuelPricePerLiter;
             
             // Overflow of fuel
             if (vehicle.Engine.CurrentEnergy + litersToFuel > vehicle.Engine.MaxEnergy)
             {
-                totalPrice = missingFuelAmount * 5;
-                totalPrice += 25; // Made a mess, spilled fuel, cost to clean is
+                totalPrice = missingFuelAmount * _fuelPricePerLiter;
+                totalPrice += _spillCleanupCost; // Made a mess, spilled fuel, cost to clean is
                 // We will wait the amount of time it takes to fill up the missingFuelAmount
-                int timeToFullyRefuel = (int)(missingFuelAmount) * 250;
+                int timeToFullyRefuel = (int)(missingFuelAmount) * _millisecondsPerLiter;
                 await Task.Delay(timeToFullyRefuel);
                 vehicle.Engine.CurrentEnergy = vehicle.Engine.MaxEnergy;
             }
             else
             {
-                int milliseconds = (int)litersToFuel * 250;
+                int milliseconds = (int)litersToFuel * _millisecondsPerLiter;
                 vehicle.Engine.CurrentEnergy += litersToFuel;
                 await Task.Delay(milliseconds);
             }
@@ -59,6 +66,7 @@ public class RefuelService : ITreatmentService
 
     public TreatmentType GetTreatmentType()
     {
-        return TreatmentType.Refuel;
+        var treatmentType = TreatmentType.Refuel;
+        return treatmentType;
     }
 }
