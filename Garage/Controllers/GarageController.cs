@@ -5,8 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Garage.Controllers;
 //TODO:
-// 1) Factory design pattern (check program.cs)
-// 2) ListRepository:  use handlers - done
+// 1) Factory design pattern (check program.cs) - done
+// 2) ListRepository - move AddVehicleRequestsToMatchingList to
+// ListProcessorService and use handlers - done
 // 3) Garage state, check what to do with the nulls - done
 // 4) In all exceptions (validation repository and GarageManagementService) dont use parameters
 // in the exceptions you throw, use exception params instead. - done

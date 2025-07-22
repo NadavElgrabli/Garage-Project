@@ -29,6 +29,7 @@ public class GarageRepository : IGarageRepository
         {
             return _db.Vehicles[licensePlate];
         }
+        
         return null;
     }
 

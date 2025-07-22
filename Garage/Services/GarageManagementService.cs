@@ -97,6 +97,7 @@ public class GarageManagementService
             Vehicle = vehicle,
             RequestedHoursToCharge = requestedHoursToCharge
         };
+        
         return chargeRequest;
     }
 
@@ -107,6 +108,7 @@ public class GarageManagementService
             Vehicle = vehicle,
             DesiredWheelPressures = desiredWheelPressures
         };
+        
         return airRequest;
     }
     
