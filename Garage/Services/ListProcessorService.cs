@@ -34,22 +34,47 @@ public class ListProcessorService
         await Task.WhenAll(processingTasks);
     }
     
+    // public void AddVehicleRequestsToMatchingList(List<TreatmentRequest> treatmentRequests)
+    // {
+    //     foreach (var request in treatmentRequests)
+    //     {
+    //         var handler = _handlers.FirstOrDefault(h => h.IsMatching(request));
+    //         
+    //         if (handler is null)
+    //             throw new ArgumentException("Unsupported treatment request type.");
+    //         
+    //         handler.Handle(request);
+    //     }
+    // }
+    
     public void AddVehicleRequestsToMatchingList(List<TreatmentRequest> treatmentRequests)
     {
-        //TODO: LINQ instead of foreach
-        foreach (var request in treatmentRequests)
+        treatmentRequests.ForEach(request =>
         {
-            var handler = _handlers.FirstOrDefault(h => h.IsMatching(request));
+            var handler = _handlers.FirstOrDefault(h => h.IsMatching(request))
+                          ?? throw new ArgumentException("Unsupported treatment request type.");
             
-            if (handler is null)
-                throw new ArgumentException("Unsupported treatment request type.");
-
-            //TODO: Handle should not receive _db in function, it should receive it in 
-            // Dependency injection
-            handler.Handle(request, _db);
-        }
+            handler.Handle(request);
+        });
     }
-
+    
+    // Without for each at all, CHATGPT said:
+    // This goes against best practices. LINQ was designed for transforming collections,
+    // not executing side effects. Using it like this is often discouraged,
+    // and most clean-code reviewers would rather see a foreach.
+    // public void AddVehicleRequestsToMatchingList(List<TreatmentRequest> treatmentRequests)
+    // {
+    //     treatmentRequests
+    //         .Select(request =>
+    //         {
+    //             var handler = _handlers.FirstOrDefault(h => h.IsMatching(request))
+    //                           ?? throw new ArgumentException("Unsupported treatment request type.");
+    //         
+    //             handler.Handle(request);
+    //             return true; // dummy return to satisfy Select
+    //         })
+    //         .ToList(); // forces evaluation
+    // }
     
     public async Task ProcessTreatmentListAsync(ITreatmentService treatmentService)
     {

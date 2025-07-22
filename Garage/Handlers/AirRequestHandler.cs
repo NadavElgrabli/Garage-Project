@@ -6,19 +6,25 @@ namespace Garage.Handlers;
 
 public class AirRequestHandler : ITreatmentRequestHandler
 {
-    //TODO: instead of receiving db use DI
+    private readonly InMemoryDatabase _db;
+
+    public AirRequestHandler(InMemoryDatabase db)
+    {
+        _db = db;
+    }
+    
     public bool IsMatching(TreatmentRequest request)
     {
-        // TODO: put in var and then return
+        var isAirRequest = request is AirRequest;
         
-        return request is AirRequest;
+        return isAirRequest;
     }
 
-    public void Handle(TreatmentRequest request, InMemoryDatabase db)
+    public void Handle(TreatmentRequest request)
     {
         if (request is not AirRequest)
             throw new ArgumentException("Invalid request type for AirRequestHandler");
 
-        db.TreatmentLists[TreatmentType.Inflate].AddLast(request);
+        _db.TreatmentLists[TreatmentType.Inflate].AddLast(request);
     }
 }

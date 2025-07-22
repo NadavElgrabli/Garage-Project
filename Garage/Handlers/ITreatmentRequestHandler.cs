@@ -6,5 +6,5 @@ namespace Garage.Handlers;
 public interface ITreatmentRequestHandler
 {
     bool IsMatching(TreatmentRequest request);
-    void Handle(TreatmentRequest request, InMemoryDatabase db);
+    void Handle(TreatmentRequest request);
 }
