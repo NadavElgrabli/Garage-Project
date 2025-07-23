@@ -2,7 +2,6 @@ using Garage.Data;
 using Garage.Factories;
 using Garage.Handlers;
 using Garage.Middlewares;
-using Garage.Models;
 using Garage.Repositories;
 using Garage.Services;
 
@@ -16,6 +15,9 @@ builder.Services.AddSingleton<ITreatmentService, InflateService>();
 builder.Services.AddSingleton<ITreatmentRequestHandler, FuelRequestHandler>();
 builder.Services.AddSingleton<ITreatmentRequestHandler, AirRequestHandler>();
 builder.Services.AddSingleton<ITreatmentRequestHandler, ChargeRequestHandler>();
+builder.Services.AddSingleton<IVehicleRequestHandler, ElectricCarRequestHandler>();
+builder.Services.AddSingleton<IVehicleRequestHandler, FuelCarRequestHandler>();
+builder.Services.AddSingleton<IVehicleRequestHandler, TruckRequestHandler>();
 builder.Services.AddSingleton<IGarageRepository, GarageRepository>();
 builder.Services.AddSingleton<GarageManagementService>();
 builder.Services.AddSingleton<IListRepository, ListRepository>();
@@ -28,13 +30,6 @@ builder.Services.AddSingleton<InMemoryDatabase>();
 builder.Services.AddSingleton<ElectricCarFactory>();
 builder.Services.AddSingleton<FuelCarFactory>();
 builder.Services.AddSingleton<TruckFactory>();
-
-builder.Services.AddSingleton(provider => new Dictionary<Type, IVehicleFactory>
-{
-    { typeof(AddElectricCarRequest), provider.GetRequiredService<ElectricCarFactory>() },
-    { typeof(AddFuelCarRequest), provider.GetRequiredService<FuelCarFactory>() },
-    {typeof(AddTruckRequest), provider.GetRequiredService<TruckFactory>() }
-});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

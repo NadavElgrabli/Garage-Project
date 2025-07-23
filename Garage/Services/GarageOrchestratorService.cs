@@ -56,6 +56,7 @@ public class GarageOrchestratorService
     {
         _validationService.CheckValidTruckInput(request);
         var truck = _garageManagementService.CreateAndAddVehicleToGarage(request);
-        
+        var treatmentRequests = _garageManagementService.GenerateTruckTreatmentRequests(truck, request);
+        _listProcessorService.AddVehicleRequestsToMatchingList(treatmentRequests);
     }
 }

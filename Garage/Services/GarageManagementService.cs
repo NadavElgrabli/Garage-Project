@@ -1,6 +1,6 @@
 ﻿using Garage.Data;
 using Garage.Enums;
-using Garage.Factories;
+using Garage.Handlers;
 using Garage.Models;
 using Garage.Repositories;
 
@@ -10,18 +10,16 @@ public class GarageManagementService
 {
     private readonly IGarageRepository _garageRepository;
     private readonly GarageState _garageState;
-    
-    //TODO: Type not as key
-    private readonly Dictionary<Type, IVehicleFactory> _vehicleFactories;
+    private readonly IEnumerable<IVehicleRequestHandler> _handlers;
     
     public GarageManagementService(
         IGarageRepository garageRepository,
         GarageState  garageState,
-        Dictionary<Type, IVehicleFactory> vehicleFactories)
+        IEnumerable<IVehicleRequestHandler> handlers)
     {
         _garageRepository = garageRepository;
         _garageState = garageState;
-        _vehicleFactories = vehicleFactories;
+        _handlers = handlers;
     }
     
     public void InitializeGarage(GarageInit init)
@@ -71,16 +69,14 @@ public class GarageManagementService
         return vehicle;
     }
     
-    //TODO: instead of dict use handler pattern
     private Vehicle CreateVehicle(Vehicle request)
     {
-        var requestType = request.GetType();
+        var handler = _handlers.FirstOrDefault(h => h.IsMatch(request))
+                      ?? throw new InvalidOperationException("No handler found for this vehicle type");
 
-        if (!_vehicleFactories.TryGetValue(requestType, out var factory))
-            throw new InvalidOperationException("No factory registered for request type");
-
-        return factory.CreateVehicle(request);
+        return handler.Handle(request);
     }
+
 
     private FuelRequest CreateFuelRequest(Vehicle vehicle, float requestedLiters)
     {
@@ -149,6 +145,19 @@ public class GarageManagementService
 
         if (car.TreatmentTypes.Contains(TreatmentType.Inflate))
             requests.Add(CreateAirRequest(car, request.DesiredWheelPressures));
+
+        return requests;
+    }
+    
+    public List<TreatmentRequest> GenerateTruckTreatmentRequests(Vehicle truck, AddTruckRequest request)
+    {
+        var requests = new List<TreatmentRequest>();
+
+        if (truck.TreatmentTypes.Contains(TreatmentType.Refuel))
+            requests.Add(CreateFuelRequest(truck, request.LitersToFuel));
+
+        if (truck.TreatmentTypes.Contains(TreatmentType.Inflate))
+            requests.Add(CreateAirRequest(truck, request.DesiredWheelPressures));
 
         return requests;
     }

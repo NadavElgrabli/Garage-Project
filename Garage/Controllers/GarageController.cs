@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Garage.Controllers;
 //TODO's:
-// 1) Factory design pattern (check program.cs) - do handlers
-// 2) In ListProcessorService fix AddVehicleRequestsToMatchingList switch for loop To LINQ - check(?)
+// 1) Factory design pattern (use handlers) in ListProcessorService - done
+// 2) In ListProcessorService fix AddVehicleRequestsToMatchingList switch "for" loop To LINQ - check(?)
 // 3) In all Handlers, add database as DI instead of receiving db in function - done
 // 4) In all Handlers IsMatch create new var before returning - done
 // 5) In all exceptions (validation repository and GarageManagementService) dont use parameters
