@@ -26,4 +26,9 @@ public class ValidationService
     {
         _validationRepository.CheckValidTruckInput(request);
     }
+
+    public void CheckValidDroneInput(AddDroneRequest request)
+    {
+        
+    }
 }

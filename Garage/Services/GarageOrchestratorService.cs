@@ -59,4 +59,11 @@ public class GarageOrchestratorService
         var treatmentRequests = _garageManagementService.GenerateTruckTreatmentRequests(truck, request);
         _listProcessorService.AddVehicleRequestsToMatchingList(treatmentRequests);
     }
+
+    public void AddDrone(AddDroneRequest request)
+    {
+        _validationService.CheckValidDroneInput(request);
+        var drone =  _garageManagementService.CreateAndAddVehicleToGarage(request);
+        
+    }
 }

@@ -7,4 +7,5 @@ public interface IValidationRepository
     void CheckValidElectricCarInput(AddElectricCarRequest request);
     void CheckValidFuelCarInput(AddFuelCarRequest request);
     void CheckValidTruckInput(AddTruckRequest request);
+    void CheckValidDroneInput(AddDroneRequest request);
 }

@@ -86,4 +86,12 @@ public class GarageController : ControllerBase
         
         return Ok("Truck added successfully");
     }
+
+    [HttpPost("AddDrone")]
+    public IActionResult AddDrone([FromBody] AddDroneRequest request)
+    {
+        _garageOrchestratorService.AddDrone(request);
+        
+        return Ok("Drone added successfully");
+    }
 }

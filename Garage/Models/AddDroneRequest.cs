@@ -2,8 +2,9 @@
 
 namespace Garage.Models;
 
-public class Drone : Vehicle
+public class AddDroneRequest : Vehicle
 {
     public List<Engine> Engines { get; set; }
+    public List<float> DesiredHoursToCharge { get; set; }
     public DroneControl ControlOptions { get; set; }
 }

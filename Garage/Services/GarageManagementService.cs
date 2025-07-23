@@ -112,6 +112,18 @@ public class GarageManagementService
         
         return chargeRequest;
     }
+    
+    private ChargeRequest CreateDroneChargeRequest(Vehicle vehicle, List<float> requestedHoursToCharge, List<Engine> engines)
+    {
+        var chargeRequest = new ChargeRequest
+        {
+            Vehicle = vehicle,
+            Engines = engines,
+            RequestedHoursToCharge = requestedHoursToCharge
+        };
+        
+        return chargeRequest;
+    }
 
     private AirRequest CreateAirRequest(Vehicle vehicle, List<float> desiredWheelPressures, List<Wheel> wheels)
     {
@@ -160,6 +172,16 @@ public class GarageManagementService
 
         if (truck.TreatmentTypes.Contains(TreatmentType.Inflate))
             requests.Add(CreateAirRequest(truck, request.DesiredWheelPressures, request.Wheels));
+
+        return requests;
+    }
+    
+    public List<TreatmentRequest> GenerateDroneTreatmentRequest(Vehicle drone, AddDroneRequest request)
+    {
+        var requests = new List<TreatmentRequest>();
+
+        if (drone.TreatmentTypes.Contains(TreatmentType.Recharge))
+            requests.Add(CreateDroneChargeRequest(drone, request.DesiredHoursToCharge, request.Engines));
 
         return requests;
     }
