@@ -16,12 +16,13 @@ public class FuelCarFactory : IVehicleFactory
             ModelName = fuelCarRequest.ModelName,
             LicensePlate = fuelCarRequest.LicensePlate,
             RemainingEnergyPercentage = fuelCarRequest.RemainingEnergyPercentage,
-            Engine = new FuelEngine
-            {
-                CurrentEnergy = fuelCarRequest.Engine.CurrentEnergy,
-                MaxEnergy = fuelCarRequest.Engine.MaxEnergy,
-                FuelType = FuelType.Octane95
-            },
+            // Engine = new FuelEngine // Error, current energy sint updated after RefuelService
+            // {
+            //     CurrentEnergy = fuelCarRequest.Engine.CurrentEnergy,
+            //     MaxEnergy = fuelCarRequest.Engine.MaxEnergy,
+            //     FuelType = FuelType.Octane95
+            // },
+            Engine = fuelCarRequest.Engine, //no errors if we have this in current energy
             Owner = fuelCarRequest.Owner,
             Wheels = fuelCarRequest.Wheels,
             Status = Status.Pending,

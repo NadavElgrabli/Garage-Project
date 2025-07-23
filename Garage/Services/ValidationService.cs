@@ -24,6 +24,6 @@ public class ValidationService
 
     public void CheckValidTruckInput(AddTruckRequest request)
     {
-        
+        _validationRepository.CheckValidTruckInput(request);
     }
 }

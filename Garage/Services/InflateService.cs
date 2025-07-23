@@ -34,9 +34,9 @@ public class InflateService : ITreatmentService
             float totalPrice = 0;
             vehicle.Status = Status.InTreatment;
 
-            for (int i = 0; i < vehicle.Wheels.Count; i++)
+            for (int i = 0; i < airRequest.Wheels.Count; i++)
             {
-                var wheel = vehicle.Wheels[i];
+                var wheel = airRequest.Wheels[i];
                 float target = desiredPressures[i]; // target is 10, current is 2, max is 8
 
                 // Wheel exploded from over pressure, e.g: target is 10, current is 2, max pressure is 8

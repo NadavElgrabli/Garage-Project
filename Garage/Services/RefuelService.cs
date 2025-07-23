@@ -33,23 +33,23 @@ public class RefuelService : ITreatmentService
         try
         {
             vehicle.Status = Status.InTreatment;
-            float missingFuelAmount = vehicle.Engine.MaxEnergy - vehicle.Engine.CurrentEnergy;
+            float missingFuelAmount = fuelRequest.Engine.MaxEnergy - fuelRequest.Engine.CurrentEnergy;
             float totalPrice = litersToFuel * _fuelPricePerLiter;
             
             // Overflow of fuel
-            if (vehicle.Engine.CurrentEnergy + litersToFuel > vehicle.Engine.MaxEnergy)
+            if (fuelRequest.Engine.CurrentEnergy + litersToFuel > fuelRequest.Engine.MaxEnergy)
             {
                 totalPrice = missingFuelAmount * _fuelPricePerLiter;
                 totalPrice += _spillCleanupCost; // Made a mess, spilled fuel, cost to clean is
                 // We will wait the amount of time it takes to fill up the missingFuelAmount
                 int timeToFullyRefuel = (int)(missingFuelAmount) * _millisecondsPerLiter;
                 await Task.Delay(timeToFullyRefuel);
-                vehicle.Engine.CurrentEnergy = vehicle.Engine.MaxEnergy;
+                fuelRequest.Engine.CurrentEnergy = fuelRequest.Engine.MaxEnergy;
             }
             else
             {
                 int milliseconds = (int)litersToFuel * _millisecondsPerLiter;
-                vehicle.Engine.CurrentEnergy += litersToFuel;
+                fuelRequest.Engine.CurrentEnergy += litersToFuel;
                 await Task.Delay(milliseconds);
             }
             vehicle.TreatmentsPrice += totalPrice;
