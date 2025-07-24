@@ -19,7 +19,7 @@ public class DroneFactory : IVehicleFactory
             Engine = droneRequest.Engine,
             Owner = droneRequest.Owner,
             Status = Status.Pending,
-            VehicleType = droneRequest.VehicleType,
+            VehicleType = VehicleType.Drone,
             TreatmentTypes = droneRequest.TreatmentTypes,
             TreatmentsPrice = droneRequest.TreatmentsPrice,
             ControlOptions = droneRequest.ControlOptions

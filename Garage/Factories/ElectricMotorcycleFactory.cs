@@ -20,7 +20,7 @@ public class ElectricMotorcycleFactory : IVehicleFactory
             Owner = electricMotorcycleRequest.Owner,
             Wheels = electricMotorcycleRequest.Wheels,
             Status = Status.Pending,
-            VehicleType = electricMotorcycleRequest.VehicleType,
+            VehicleType = VehicleType.Motorcycle,
             TreatmentTypes = electricMotorcycleRequest.TreatmentTypes,
             TreatmentsPrice = electricMotorcycleRequest.TreatmentsPrice,
             EngineVolumeCC = electricMotorcycleRequest.EngineVolumeCC,

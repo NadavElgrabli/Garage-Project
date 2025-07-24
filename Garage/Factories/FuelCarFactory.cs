@@ -20,7 +20,7 @@ public class FuelCarFactory : IVehicleFactory
             Owner = fuelCarRequest.Owner,
             Wheels = fuelCarRequest.Wheels,
             Status = Status.Pending,
-            VehicleType = fuelCarRequest.VehicleType,
+            VehicleType = VehicleType.Car,
             TreatmentTypes = fuelCarRequest.TreatmentTypes,
             TreatmentsPrice = fuelCarRequest.TreatmentsPrice,
             NumberOfDoors = fuelCarRequest.NumberOfDoors,

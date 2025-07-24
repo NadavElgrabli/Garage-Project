@@ -20,7 +20,7 @@ public class TruckFactory : IVehicleFactory
             Owner = truckRequest.Owner,
             Wheels = truckRequest.Wheels,
             Status = Status.Pending,
-            VehicleType = truckRequest.VehicleType,
+            VehicleType = VehicleType.Truck,
             TreatmentTypes = truckRequest.TreatmentTypes,
             TreatmentsPrice = truckRequest.TreatmentsPrice,
             CarryDangerousSubstances = truckRequest.CarryDangerousSubstances,
