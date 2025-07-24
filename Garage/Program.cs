@@ -18,6 +18,7 @@ builder.Services.AddSingleton<ITreatmentRequestHandler, ChargeRequestHandler>();
 builder.Services.AddSingleton<IVehicleRequestHandler, ElectricCarRequestHandler>();
 builder.Services.AddSingleton<IVehicleRequestHandler, FuelCarRequestHandler>();
 builder.Services.AddSingleton<IVehicleRequestHandler, FuelMotorcycleRequestHandler>();
+builder.Services.AddSingleton<IVehicleRequestHandler, ElectricMotorcycleRequestHandler>();
 builder.Services.AddSingleton<IVehicleRequestHandler, TruckRequestHandler>();
 builder.Services.AddSingleton<IVehicleRequestHandler, DroneRequestHandler>();
 builder.Services.AddSingleton<IGarageRepository, GarageRepository>();
@@ -32,6 +33,7 @@ builder.Services.AddSingleton<InMemoryDatabase>();
 builder.Services.AddSingleton<ElectricCarFactory>();
 builder.Services.AddSingleton<FuelCarFactory>();
 builder.Services.AddSingleton<FuelMotorcycleFactory>();
+builder.Services.AddSingleton<ElectricMotorcycleFactory>();
 builder.Services.AddSingleton<TruckFactory>();
 builder.Services.AddSingleton<DroneFactory>();
 

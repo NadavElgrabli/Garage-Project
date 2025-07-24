@@ -12,6 +12,7 @@ public class ValidationRepository : IValidationRepository
     private readonly float _maxElectricCarEnergy;
     private readonly float _maxFuelCarEnergy;
     private readonly float _maxFuelMotorcycleEnergy;
+    private readonly float _maxElectricMotorcycleEnergy;
     private readonly float _maxTruckEnergy;
     private readonly float _maxDroneEnergy;
     
@@ -35,6 +36,7 @@ public class ValidationRepository : IValidationRepository
         _maxFuelCarEnergy = config.GetValue<float>("Validation:MaxFuelCarEnergy");
         _maxTruckEnergy = config.GetValue<float>("Validation:MaxTruckEnergy");
         _maxFuelMotorcycleEnergy =  config.GetValue<float>("Validation:MaxFuelMotorcycleEnergy");
+        _maxElectricMotorcycleEnergy =  config.GetValue<float>("Validation:MaxElectricMotorcycleEnergy");
         _maxDroneEnergy = config.GetValue<float>("Validation:MaxDroneEnergy");
         _minTreatments = config.GetValue<int>("Validation:MinimumNumberOfTreatments");
         _maxTreatments = config.GetValue<int>("Validation:MaximumNumberOfTreatments");
@@ -127,7 +129,40 @@ public class ValidationRepository : IValidationRepository
         );
         
         if (request.TreatmentTypes.Contains(TreatmentType.Recharge))
-            errors.Add("Cannot have a recharge treatment for a fuel car.");
+            errors.Add("Cannot have a recharge treatment for a fuel motorcycle.");
+
+        if (errors.Any())
+        {
+            var message = "Invalid input:\n- " + string.Join("\n- ", errors);
+            var ex = new InvalidOperationException(message);
+
+            foreach (var pair in errorData)
+            {
+                ex.Data[pair.Key] = pair.Value;
+            }
+
+            throw ex;
+        }
+    }
+    
+    public void CheckValidElectricMotorcycleInput(AddElectricMotorcycleRequest request)
+    {
+        var errors = new List<string>();
+        var errorData = new Dictionary<string, object>();
+
+        ValidateCommonVehicleInput(request, errors);
+        ValidateEngine(request.Engine, _maxElectricMotorcycleEnergy, errors, errorData);
+        ValidateWheels(
+            request.Wheels,
+            request.DesiredWheelPressures,
+            _numberOfMotorcycleWheels,
+            _motorcycleWheelMaxPressure,
+            errors,
+            errorData
+        );
+        
+        if (request.TreatmentTypes.Contains(TreatmentType.Refuel))
+            errors.Add("Cannot have a refuel treatment for an electric motorcycle.");
 
         if (errors.Any())
         {

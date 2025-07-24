@@ -14,7 +14,9 @@ public class FuelMotorcycleRequestHandler : IVehicleRequestHandler
 
     public bool IsMatch(Vehicle request)
     {
-        return request is AddFuelMotorcycleRequest;
+        var isAddFuelMotorcycleRequest = request is AddFuelMotorcycleRequest;
+        
+        return isAddFuelMotorcycleRequest;
     }
 
     public Vehicle Handle(Vehicle request)

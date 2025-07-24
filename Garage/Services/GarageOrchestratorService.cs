@@ -59,6 +59,14 @@ public class GarageOrchestratorService
         var treatmentRequests = _garageManagementService.GenerateFuelMotorcycleTreatmentRequests(motorcycle, request);
         _listProcessorService.AddVehicleRequestsToMatchingList(treatmentRequests);
     }
+    
+    public void AddElectricMotorcycle(AddElectricMotorcycleRequest request)
+    {
+        _validationService.CheckValidElectricMotorcycleInput(request);
+        var motorcycle = _garageManagementService.CreateAndAddVehicleToGarage(request);
+        var treatmentRequests = _garageManagementService.GenerateElectricMotorcycleTreatmentRequests(motorcycle, request);
+        _listProcessorService.AddVehicleRequestsToMatchingList(treatmentRequests);
+    }
 
     public void AddTruck(AddTruckRequest request)
     {

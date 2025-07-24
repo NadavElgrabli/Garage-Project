@@ -164,6 +164,19 @@ public class GarageManagementService
         return requests;
     }
     
+    public List<TreatmentRequest> GenerateElectricMotorcycleTreatmentRequests(Vehicle motorcycle, AddElectricMotorcycleRequest request)
+    {
+        var requests = new List<TreatmentRequest>();
+
+        if (motorcycle.TreatmentTypes.Contains(TreatmentType.Recharge))
+            requests.Add(CreateChargeRequest(motorcycle, request.HoursToCharge, request.Engine));
+
+        if (motorcycle.TreatmentTypes.Contains(TreatmentType.Inflate))
+            requests.Add(CreateAirRequest(motorcycle, request.DesiredWheelPressures, request.Wheels));
+
+        return requests;
+    }
+    
     public List<TreatmentRequest> GenerateTruckTreatmentRequests(Vehicle truck, AddTruckRequest request)
     {
         var requests = new List<TreatmentRequest>();

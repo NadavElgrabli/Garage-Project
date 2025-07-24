@@ -36,4 +36,9 @@ public class ValidationService
     {
         _validationRepository.CheckValidFuelMotorcycleInput(request);
     }
+
+    public void CheckValidElectricMotorcycleInput(AddElectricMotorcycleRequest request)
+    {
+        _validationRepository.CheckValidElectricMotorcycleInput(request);
+    }
 }

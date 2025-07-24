@@ -102,4 +102,12 @@ public class GarageController : ControllerBase
         
         return Ok("Fuel motorcycle added successfully");
     }
+    
+    [HttpPost("AddElectricMotorcycle")]
+    public IActionResult AddElectricMotorcycle([FromBody] AddElectricMotorcycleRequest request)
+    {
+        _garageOrchestratorService.AddElectricMotorcycle(request);
+        
+        return Ok("Electric motorcycle added successfully");
+    }
 }
