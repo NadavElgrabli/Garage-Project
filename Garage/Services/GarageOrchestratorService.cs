@@ -23,17 +23,23 @@ public class GarageOrchestratorService
 
     public IEnumerable<VehicleInfo> GetVehiclesByStatus(Status status)
     {
-        return _garageManagementService.DisplayVehiclesByStatus(status);
+        var vehicles = _garageManagementService.DisplayVehiclesByStatus(status);
+        
+        return vehicles;
     }
 
     public Vehicle GetVehicleByLicensePlate(string licensePlate)
     {
-        return _garageManagementService.GetVehicleByLicensePlateOrThrow(licensePlate);
+        var vehicle = _garageManagementService.GetVehicleByLicensePlateOrThrow(licensePlate);
+        
+        return vehicle;
     }
 
     public Vehicle PickUpVehicle(string licensePlate)
     {
-        return _garageManagementService.PickUpVehicle(licensePlate);
+        var vehicle = _garageManagementService.PickUpVehicle(licensePlate);
+        
+        return vehicle;
     }
 
     public void AddElectricCar(AddElectricCarRequest request)
