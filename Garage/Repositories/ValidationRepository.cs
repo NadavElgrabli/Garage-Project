@@ -32,20 +32,26 @@ public class ValidationRepository : IValidationRepository
         _garageState  = garageState;
         _db = db;
 
-        _maxElectricCarEnergy = config.GetValue<float>("Validation:MaxElectricCarEnergy");
-        _maxFuelCarEnergy = config.GetValue<float>("Validation:MaxFuelCarEnergy");
-        _maxTruckEnergy = config.GetValue<float>("Validation:MaxTruckEnergy");
-        _maxFuelMotorcycleEnergy =  config.GetValue<float>("Validation:MaxFuelMotorcycleEnergy");
-        _maxElectricMotorcycleEnergy =  config.GetValue<float>("Validation:MaxElectricMotorcycleEnergy");
-        _maxDroneEnergy = config.GetValue<float>("Validation:MaxDroneEnergy");
-        _minTreatments = config.GetValue<int>("Validation:MinimumNumberOfTreatments");
-        _maxTreatments = config.GetValue<int>("Validation:MaximumNumberOfTreatments");
-        _numberOfCarWheels = config.GetValue<int>("Validation:NumberOfCarWheels");
-        _numberOfMotorcycleWheels =  config.GetValue<int>("Validation:NumberOfMotorcycleWheels");
-        _numberOfTruckWheels = config.GetValue<int>("Validation:NumberOfTruckWheels");
-        _carWheelMaxPressure = config.GetValue<float>("Validation:CarWheelMaxPressure");
-        _motorcycleWheelMaxPressure =  config.GetValue<float>("Validation:MotorcycleWheelMaxPressure");
-        _truckWheelMaxPressure = config.GetValue<float>("Validation:TruckWheelMaxPressure");
+        // TODO: Create a new class (Under Garage) called ConfigurationKeys. This class will have the route
+        // for each of the appsettings.json key, for example in this case: Validation:MaxElectricCarEnergy,
+        // save as const and then use as shortcut here below
+        _maxElectricCarEnergy = config.GetValue<float>(ConfigurationKeys.Validation.MaxElectricCarEnergy);
+        _maxFuelCarEnergy = config.GetValue<float>(ConfigurationKeys.Validation.MaxFuelCarEnergy);
+        _maxTruckEnergy = config.GetValue<float>(ConfigurationKeys.Validation.MaxTruckEnergy);
+        _maxFuelMotorcycleEnergy = config.GetValue<float>(ConfigurationKeys.Validation.MaxFuelMotorcycleEnergy);
+        _maxElectricMotorcycleEnergy = config.GetValue<float>(ConfigurationKeys.Validation.MaxElectricMotorcycleEnergy);
+        _maxDroneEnergy = config.GetValue<float>(ConfigurationKeys.Validation.MaxDroneEnergy);
+
+        _minTreatments = config.GetValue<int>(ConfigurationKeys.Validation.MinimumNumberOfTreatments);
+        _maxTreatments = config.GetValue<int>(ConfigurationKeys.Validation.MaximumNumberOfTreatments);
+
+        _numberOfCarWheels = config.GetValue<int>(ConfigurationKeys.Validation.NumberOfCarWheels);
+        _numberOfMotorcycleWheels = config.GetValue<int>(ConfigurationKeys.Validation.NumberOfMotorcycleWheels);
+        _numberOfTruckWheels = config.GetValue<int>(ConfigurationKeys.Validation.NumberOfTruckWheels);
+
+        _carWheelMaxPressure = config.GetValue<float>(ConfigurationKeys.Validation.CarWheelMaxPressure);
+        _motorcycleWheelMaxPressure = config.GetValue<float>(ConfigurationKeys.Validation.MotorcycleWheelMaxPressure);
+        _truckWheelMaxPressure = config.GetValue<float>(ConfigurationKeys.Validation.TruckWheelMaxPressure);
     }
     
     public void CheckValidElectricCarInput(AddElectricCarRequest request)
@@ -260,13 +266,13 @@ public class ValidationRepository : IValidationRepository
 
             if (current > desired)
             {
-                errors.Add($"Wheel {i}: current pressure above desired.");
+                errors.Add("Wheel current pressure above desired.");
                 errorData[$"Wheel_{i}_CurrentVsDesired"] = new { Current = current, Desired = desired };
             }
 
             if (current > maxPressure)
             {
-                errors.Add($"Wheel {i}: pressure above max ({maxPressure}).");
+                errors.Add("Wheel pressure above max).");
                 errorData[$"Wheel_{i}_Pressure_Too_High"] = current;
             }
         }
@@ -277,163 +283,13 @@ public class ValidationRepository : IValidationRepository
         if (engine.CurrentEnergy > engine.MaxEnergy)
         {
             errors.Add("Engine's current energy is higher than its maximum capacity.");
-            errorData["Engine_CurrentEnergy"] = engine.CurrentEnergy;
+            errorData["engineCurrentEnergy"] = engine.CurrentEnergy;
         }
 
         if (engine.MaxEnergy > maxEnergy)
         {
             errors.Add("Engine's max energy is above the allowed maximum of energy.");
-            errorData["Engine_MaxEnergy"] = engine.MaxEnergy;
+            errorData["engineMaxEnergy"] = engine.MaxEnergy;
         }
     }
 }
-
-
-// private void ValidateCommonCarInput(Vehicle request, List<float> desiredWheelPressures, List<string> errors, Dictionary<string, object> errorData)
-// {
-//     if (request.Engine.CurrentEnergy > request.Engine.MaxEnergy)
-//     {
-//         errors.Add("Engine's current energy is higher than the maximum capacity.");
-//         errorData["CurrentEngineEnergy"] = request.Engine.CurrentEnergy;
-//     }
-//     
-//     if (request.Wheels.Count != desiredWheelPressures.Count)
-//         errors.Add("Number of wheels does not match the number of desired wheel pressures.");
-//
-//     if (request.Wheels.Count != _numberOfCarWheels ||
-//         desiredWheelPressures.Count != _numberOfCarWheels)
-//         errors.Add("Number of wheels for cars must equal 4, and the desired pressures must contain 4 pressures.");
-//
-//     for (int i = 0; i < request.Wheels.Count; i++)
-//     {
-//         var current = request.Wheels[i].CurrentPressure;
-//         var desired = desiredWheelPressures[i];
-//
-//         if (current > desired)
-//         {
-//             errors.Add($"Wheel at index {i} has current pressure above desired pressure.");
-//             errorData[$"Wheel[{i}].CurrentPressureVsDesired"] = new { Current = current, Desired = desired };
-//         }
-//         
-//         if (current > _carWheelMaxPressure)
-//         {
-//             errors.Add($"Wheel at index {i} has current pressure above the maximum (30).");
-//             errorData[$"Wheel[{i}].CurrentPressure"] = current;
-//         }
-//     }
-// }
-
-
-
-
-// public void CheckValidElectricCarInput(AddElectricCarRequest request)
-// {
-//     var errors = new List<string>();
-//
-//     ValidateCommonVehicleInput(request, errors);
-//     ValidateCommonCarInput(request, request.DesiredWheelPressures, errors);
-//
-//     if (request.TreatmentTypes.Contains(TreatmentType.Refuel))
-//         errors.Add("Cannot have a refuel treatment for an electric car.");
-//
-//     //TODO: use exception params.
-//     if (request.Engine.MaxEnergy > 2.8)
-//         errors.Add("Maximum charge is above 2.8 which is the maximum.");
-//
-//     if (errors.Any())
-//         throw new InvalidOperationException("Invalid input:\n- " + string.Join("\n- ", errors));
-// }
-
-
-// public void CheckValidFuelCarInput(AddFuelCarRequest request)
-// {
-//     var errors = new List<string>();
-//
-//     ValidateCommonVehicleInput(request, errors);
-//     ValidateCommonCarInput(request, request.DesiredWheelPressures, errors);
-//
-//     if (request.TreatmentTypes.Contains(TreatmentType.Recharge))
-//         errors.Add("Cannot have a recharge treatment for a fuel car.");
-//
-//     //TODO: use exception params here to save the current maximum value.
-//     if (request.Engine.MaxEnergy > 50)
-//         errors.Add("Maximum fuel tank capacity is 50. Current maximum value is above 50.");
-//
-//     if (errors.Any())
-//         throw new InvalidOperationException("Invalid input:\n- " + string.Join("\n- ", errors));
-// }
-
-
-
-// private void ValidateCommonVehicleInput(Vehicle request, List<string> errors)
-// {
-//     if (!_garageState.IsInitialized)
-//         errors.Add("Garage must be initialized before adding vehicles.");
-//
-//     if (_db.Vehicles.ContainsKey(request.LicensePlate))
-//         errors.Add("Car already in garage.");
-//
-//     if (request.TreatmentTypes.Count is > 2 or < 1)
-//         errors.Add("Number of treatments must be either 1 or 2.");
-//
-//     //TODO: use exception params, save current energy as .Data
-//     if (request.Engine.CurrentEnergy > request.Engine.MaxEnergy)
-//         errors.Add("Engine's current energy is higher than the maximum capacity.");
-// }
-
-
-
-// private void ValidateCommonCarInput(Vehicle request, List<float> desiredWheelPressures, List<string> errors)
-// {
-//     if (request.Wheels.Count != desiredWheelPressures.Count)
-//         errors.Add("Number of wheels does not match the number of desired wheel pressures.");
-//
-//     if (request.Wheels.Count != 4 || desiredWheelPressures.Count != 4)
-//     {
-//         errors.Add("Number of wheels for cars must equal 4, and the desired pressures must contain 4 pressures.");
-//     }
-//
-//     for (int i = 0; i < request.Wheels.Count; i++)
-//     {
-//         if (request.Wheels[i].CurrentPressure > desiredWheelPressures[i])
-//             errors.Add("One of the wheel's current pressure is above the desired pressure.");
-//
-//         if (request.Wheels[i].CurrentPressure > 30)
-//             errors.Add("One of the wheel's current pressure is above the maximum (30).");
-//     }
-// }
-
-
-// public void CheckValidTruckInput(AddTruckRequest request)
-// {
-//     var errors = new List<string>();
-//     
-//     ValidateCommonVehicleInput(request, errors);
-//     
-//     if (request.Wheels.Count != request.DesiredWheelPressures.Count)
-//         errors.Add("Number of wheels does not match the number of desired wheel pressures.");
-//
-//     if (request.Wheels.Count != 16 || request.DesiredWheelPressures.Count != 16)
-//     {
-//         errors.Add("Number of wheels for trucks must equal 16, and the desired pressures must contain 16 pressures.");
-//     }
-//
-//     for (int i = 0; i < request.Wheels.Count; i++)
-//     {
-//         if (request.Wheels[i].CurrentPressure > request.DesiredWheelPressures[i])
-//             errors.Add("One of the wheel's current pressure is above the desired pressure.");
-//
-//         if (request.Wheels[i].CurrentPressure > 26)
-//             errors.Add("One of the wheel's current pressure is above the maximum (26).");
-//     }
-//     
-//     if (request.TreatmentTypes.Contains(TreatmentType.Recharge))
-//         errors.Add("Cannot have a recharge treatment for a truck.");
-//
-//     //TODO: use .Data
-//     if (request.Engine.MaxEnergy > 110)
-//         errors.Add("Maximum fuel tank capacity is 50. Current value is above 50.");
-//     
-//     if (errors.Any())
-//         throw new InvalidOperationException("Invalid input:\n- " + string.Join("\n- ", errors));
-// }

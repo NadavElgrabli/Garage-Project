@@ -15,9 +15,9 @@ public class RechargeService : ITreatmentService
     {
         _garageState = garageState;
         
-        _pricePerHour = config.GetValue<float>("Recharge:PricePerHour");
-        _overchargePenalty = config.GetValue<float>("Recharge:OverchargePenalty");
-        _millisecondsPerHour = config.GetValue<int>("Recharge:MillisecondsPerHour");
+        _pricePerHour = config.GetValue<float>(ConfigurationKeys.Recharge.PricePerHour);
+        _overchargePenalty = config.GetValue<float>(ConfigurationKeys.Recharge.OverchargePenalty);
+        _millisecondsPerHour = config.GetValue<int>(ConfigurationKeys.Recharge.MillisecondsPerHour);
     }
     
     public async Task TreatAsync(Vehicle vehicle, TreatmentRequest request)

@@ -5,19 +5,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Garage.Controllers;
 //TODO's:
-// 1) Factory design pattern (use handlers) in ListProcessorService - done
-// 2) In ListProcessorService fix AddVehicleRequestsToMatchingList switch "for" loop To LINQ - check(?)
-// 3) In all Handlers, add database as DI instead of receiving db in function - done
-// 4) In all Handlers IsMatch create new var before returning - done
-// 5) In all exceptions (validation repository and GarageManagementService) dont use parameters
-// in the exceptions you throw, use exception params instead.
-// use https://www.ashtamkea.com/p/csharpexeptionhandling.html - done
-// 6) Use IConfiguration for magic numbers (validation repository / services/ etc..) - done
-// 7) check: enter before return - 
-// 8) check: "== null" - 
-// 9) check: no {} for 1 line ifs -
-// 10) check: always create new var before returning
-// 11) move all treatments to handlers, they aren't services -
+// 1) check: enter before return - 
+// 2) check: "== null" - 
+// 3) check: no {} for 1 line ifs -
+// 4) check: always create new var before returning
+// 5) In handlers, use repository when you call db
+// 6) Create a new class (Under Garage) called ConfigurationKeys. This class will have the route
+// for each of the appsettings.json key, save as const and then use as shortcut where they
+// are used - done
+// 7) In GarageManagementService, create handlers for generating treatmentRequests.
 [ApiController]
 [Route("api/[controller]")]
 public class GarageController : ControllerBase

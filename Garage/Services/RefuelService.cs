@@ -15,9 +15,9 @@ public class RefuelService : ITreatmentService
     {
         _garageState = garageState;
         
-        _fuelPricePerLiter = config.GetValue<float>("Refuel:FuelPricePerLiter");
-        _spillCleanupCost = config.GetValue<float>("Refuel:SpillCleanupCost");
-        _millisecondsPerLiter = config.GetValue<int>("Refuel:MillisecondsPerLiter");
+        _fuelPricePerLiter = config.GetValue<float>(ConfigurationKeys.Refuel.FuelPricePerLiter);
+        _spillCleanupCost = config.GetValue<float>(ConfigurationKeys.Refuel.SpillCleanupCost);
+        _millisecondsPerLiter = config.GetValue<int>(ConfigurationKeys.Refuel.MillisecondsPerLiter);
     }
     
     public async Task TreatAsync(Vehicle vehicle, TreatmentRequest request)

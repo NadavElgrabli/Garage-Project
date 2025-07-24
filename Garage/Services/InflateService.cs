@@ -7,6 +7,7 @@ namespace Garage.Services;
 public class InflateService : ITreatmentService
 {
     private readonly GarageState _garageState;
+    
     private readonly int _delayPerPressureUnitInMilliseconds;
     private readonly float _explosionPenalty;
     private readonly float _pricePerPressureUnit;
@@ -14,9 +15,10 @@ public class InflateService : ITreatmentService
     public InflateService(GarageState garageState, IConfiguration config)
     {
         _garageState = garageState;
-        _delayPerPressureUnitInMilliseconds = config.GetValue<int>("Inflate:DelayPerPressureUnitInMilliseconds");
-        _explosionPenalty = config.GetValue<float>("Inflate:ExplosionPenalty");
-        _pricePerPressureUnit = config.GetValue<float>("Inflate:PricePerPressureUnit");
+        
+        _delayPerPressureUnitInMilliseconds = config.GetValue<int>(ConfigurationKeys.Inflate.DelayPerPressureUnitInMilliseconds);
+        _explosionPenalty = config.GetValue<float>(ConfigurationKeys.Inflate.ExplosionPenalty);
+        _pricePerPressureUnit = config.GetValue<float>(ConfigurationKeys.Inflate.PricePerPressureUnit);
     }
     
     public async Task TreatAsync(Vehicle vehicle, TreatmentRequest request)

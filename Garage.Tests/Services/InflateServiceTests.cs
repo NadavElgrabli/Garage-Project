@@ -149,7 +149,7 @@ public class InflateServiceTests
     }
 
     [Fact]
-    public async Task TreatAsync_ShouldPartiallyInflateAllWheels()
+    public async Task TreatAsync_ShouldPartiallyInflateAllWheels_WhenWheelsNotFullyInflated()
     {
         var wheels = new List<Wheel>
         {
