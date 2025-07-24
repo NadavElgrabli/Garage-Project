@@ -177,19 +177,6 @@ public class ValidationRepository : IValidationRepository
             throw ex;
         }
     }
-
-    private void ValidateCommonVehicleInput(Vehicle request, List<string> errors)
-    {
-        if (!_garageState.IsInitialized)
-            errors.Add("Garage must be initialized before adding vehicles.");
-
-        if (_db.Vehicles.ContainsKey(request.LicensePlate))
-            errors.Add("Car already in garage.");
-
-        if (request.TreatmentTypes.Count > _maxTreatments ||
-            request.TreatmentTypes.Count < _minTreatments)
-            errors.Add("Number of treatments must be either 1 or 2.");
-    }
     
     public void CheckValidTruckInput(AddTruckRequest request)
     {
@@ -245,6 +232,18 @@ public class ValidationRepository : IValidationRepository
         }
     }
 
+    private void ValidateCommonVehicleInput(Vehicle request, List<string> errors)
+    {
+        if (!_garageState.IsInitialized)
+            errors.Add("Garage must be initialized before adding vehicles.");
+
+        if (_db.Vehicles.ContainsKey(request.LicensePlate))
+            errors.Add("Car already in garage.");
+
+        if (request.TreatmentTypes.Count > _maxTreatments ||
+            request.TreatmentTypes.Count < _minTreatments)
+            errors.Add("Number of treatments must be either 1 or 2.");
+    }
     
     private void ValidateWheels(List<Wheel> wheels, List<float> desiredPressures, int expectedCount, float maxPressure, List<string> errors, Dictionary<string, object> errorData)
     {
