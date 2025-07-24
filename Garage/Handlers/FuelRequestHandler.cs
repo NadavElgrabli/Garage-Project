@@ -1,17 +1,18 @@
-﻿using Garage.Data;
-using Garage.Enums;
+﻿using Garage.Enums;
 using Garage.Models;
+using Garage.Repositories;
 
 namespace Garage.Handlers;
 
 public class FuelRequestHandler : ITreatmentRequestHandler
 {
-    private readonly InMemoryDatabase _db;
+    private readonly IListRepository _listRepository;
 
-    public FuelRequestHandler(InMemoryDatabase db)
+    public FuelRequestHandler(IListRepository listRepository)
     {
-        _db = db;
+        _listRepository = listRepository;
     }
+
     
     public bool IsMatching(TreatmentRequest request)
     {
@@ -25,6 +26,6 @@ public class FuelRequestHandler : ITreatmentRequestHandler
         if (request is not FuelRequest)
             throw new ArgumentException("Invalid request type for FuelRequestHandler");
 
-        _db.TreatmentLists[TreatmentType.Refuel].AddLast(request);
+        _listRepository.AddRequest(TreatmentType.Refuel, request);
     }
 }

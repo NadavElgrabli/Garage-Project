@@ -1,16 +1,16 @@
-﻿using Garage.Data;
-using Garage.Enums;
+﻿using Garage.Enums;
 using Garage.Models;
+using Garage.Repositories;
 
 namespace Garage.Handlers;
 
 public class AirRequestHandler : ITreatmentRequestHandler
 {
-    private readonly InMemoryDatabase _db;
+    private readonly IListRepository _listRepository;
 
-    public AirRequestHandler(InMemoryDatabase db)
+    public AirRequestHandler(IListRepository listRepository)
     {
-        _db = db;
+        _listRepository = listRepository;
     }
     
     public bool IsMatching(TreatmentRequest request)
@@ -25,6 +25,6 @@ public class AirRequestHandler : ITreatmentRequestHandler
         if (request is not AirRequest)
             throw new ArgumentException("Invalid request type for AirRequestHandler");
 
-        _db.TreatmentLists[TreatmentType.Inflate].AddLast(request);
+        _listRepository.AddRequest(TreatmentType.Inflate, request);
     }
 }

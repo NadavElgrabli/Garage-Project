@@ -1,16 +1,16 @@
-﻿using Garage.Data;
-using Garage.Enums;
+﻿using Garage.Enums;
 using Garage.Models;
+using Garage.Repositories;
 
 namespace Garage.Handlers;
 
 public class ChargeRequestHandler : ITreatmentRequestHandler
 {
-    private readonly InMemoryDatabase _db;
+    private readonly IListRepository _listRepository;
 
-    public ChargeRequestHandler(InMemoryDatabase db)
+    public ChargeRequestHandler(IListRepository listRepository)
     {
-        _db = db;
+        _listRepository = listRepository;
     }
     
     public bool IsMatching(TreatmentRequest request)
@@ -25,6 +25,6 @@ public class ChargeRequestHandler : ITreatmentRequestHandler
         if (request is not ChargeRequest)
             throw new ArgumentException("Invalid request type for ChargeRequestHandler");
 
-        _db.TreatmentLists[TreatmentType.Recharge].AddLast(request);
+        _listRepository.AddRequest(TreatmentType.Recharge, request);
     }
 }

@@ -14,7 +14,6 @@ public class ListRepository : IListRepository
         _db = db;
     }
     
-    // Returns the first request that's vehicle is not "IntTreatment" or null if vehicle / list doesn't exist.
     public TreatmentRequest? FindFirstAvailableVehicleRequest(ITreatmentService treatmentService)
     {
         var type = treatmentService.GetTreatmentType();
@@ -25,7 +24,6 @@ public class ListRepository : IListRepository
         return list.FirstOrDefault(request => request.Vehicle.Status != Status.InTreatment);
     }
     
-    // Returns true if the request was found and successfully removed; false if it was not found or the list does not exist.
     public bool RemoveRequest(ITreatmentService treatmentService, TreatmentRequest request)
     {
         var type = treatmentService.GetTreatmentType();
@@ -35,4 +33,10 @@ public class ListRepository : IListRepository
 
         return list.Remove(request);
     }
+    
+    public void AddRequest(TreatmentType type, TreatmentRequest request)
+    {
+        _db.TreatmentLists[type].AddLast(request);
+    }
+
 }
