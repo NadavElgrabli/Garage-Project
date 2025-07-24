@@ -1,5 +1,4 @@
 ﻿using Garage.Enums;
-using Garage.Interfaces;
 
 namespace Garage.Models;
 

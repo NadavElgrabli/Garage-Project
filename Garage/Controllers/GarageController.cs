@@ -13,7 +13,8 @@ namespace Garage.Controllers;
 // 6) Create a new class (Under Garage) called ConfigurationKeys. This class will have the route
 // for each of the appsettings.json key, save as const and then use as shortcut where they
 // are used - done
-// 7) In GarageManagementService, create handlers for generating treatmentRequests.
+// 7) In GarageManagementService, create handlers for generating treatmentRequests (I dont like
+// the ifs every time)
 [ApiController]
 [Route("api/[controller]")]
 public class GarageController : ControllerBase
