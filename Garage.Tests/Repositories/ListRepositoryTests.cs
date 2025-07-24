@@ -31,7 +31,6 @@ public class ListRepositoryTests
         list.AddLast(request2); // Should be skipped
         list.AddLast(request3);
 
-        //TODO: use dependency injection instead of creating "new" db
         var db = new InMemoryDatabase();
         db.TreatmentLists[TreatmentType.Recharge] = list;
         

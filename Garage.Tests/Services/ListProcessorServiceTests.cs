@@ -51,7 +51,7 @@ public class ListProcessorServiceTests
             Enumerable.Empty<ITreatmentRequestHandler>()
         );
         // Act
-        // We'll run the method for a short time and let it process once
+        // Run the method for a short time and let it process once
         var processTask = Task.Run(async () =>
         {
             await service.ProcessTreatmentListAsync(mockTreatmentService.Object);

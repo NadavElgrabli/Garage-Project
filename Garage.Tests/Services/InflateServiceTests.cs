@@ -23,7 +23,7 @@ public class InflateServiceTests
     }
 
     [Fact]
-    public async Task TreatAsync_ShouldInflateWheelsFully()
+    public async Task TreatAsync_ShouldInflateWheelsFully_WhenTheyAreNotFullyInflated()
     {
         var wheels = new List<Wheel>
         {
@@ -64,7 +64,7 @@ public class InflateServiceTests
     }
 
     [Fact]
-    public async Task TreatAsync_ShouldOverInflateCertainWheels()
+    public async Task TreatAsync_ShouldOverInflateCertainWheels_WhenTheyAreNotFullyInflated()
     {
         var wheels = new List<Wheel>
         {
@@ -108,7 +108,7 @@ public class InflateServiceTests
     }
 
     [Fact]
-    public async Task TreatAsync_ShouldOverInflateAllWheels()
+    public async Task TreatAsync_ShouldOverInflateAllWheels_WhenTheyAreNotFullyInflated()
     {
         var wheels = new List<Wheel>
         {
