@@ -14,7 +14,9 @@ public class ElectricCarRequestHandler : IVehicleRequestHandler
 
     public bool IsMatch(Vehicle request)
     {
-        return request is AddElectricCarRequest;
+        var isAddElectricCarRequest = request is AddElectricCarRequest;
+        
+        return isAddElectricCarRequest;
     }
 
     public Vehicle Handle(Vehicle request)

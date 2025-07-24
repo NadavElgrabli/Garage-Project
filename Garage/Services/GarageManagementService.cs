@@ -112,18 +112,6 @@ public class GarageManagementService
         
         return chargeRequest;
     }
-    
-    private ChargeRequest CreateDroneChargeRequest(Vehicle vehicle, List<float> requestedHoursToCharge, List<Engine> engines)
-    {
-        var chargeRequest = new ChargeRequest
-        {
-            Vehicle = vehicle,
-            Engines = engines,
-            RequestedHoursToCharge = requestedHoursToCharge
-        };
-        
-        return chargeRequest;
-    }
 
     private AirRequest CreateAirRequest(Vehicle vehicle, List<float> desiredWheelPressures, List<Wheel> wheels)
     {
@@ -163,6 +151,19 @@ public class GarageManagementService
         return requests;
     }
     
+    public List<TreatmentRequest> GenerateFuelMotorcycleTreatmentRequests(Vehicle motorcycle, AddFuelMotorcycleRequest request)
+    {
+        var requests = new List<TreatmentRequest>();
+
+        if (motorcycle.TreatmentTypes.Contains(TreatmentType.Refuel))
+            requests.Add(CreateFuelRequest(motorcycle, request.LitersToFuel, request.Engine));
+
+        if (motorcycle.TreatmentTypes.Contains(TreatmentType.Inflate))
+            requests.Add(CreateAirRequest(motorcycle, request.DesiredWheelPressures, request.Wheels));
+
+        return requests;
+    }
+    
     public List<TreatmentRequest> GenerateTruckTreatmentRequests(Vehicle truck, AddTruckRequest request)
     {
         var requests = new List<TreatmentRequest>();
@@ -181,7 +182,7 @@ public class GarageManagementService
         var requests = new List<TreatmentRequest>();
 
         if (drone.TreatmentTypes.Contains(TreatmentType.Recharge))
-            requests.Add(CreateDroneChargeRequest(drone, request.DesiredHoursToCharge, request.Engines));
+            requests.Add(CreateChargeRequest(drone, request.DesiredHoursToCharge, request.Engine));
 
         return requests;
     }

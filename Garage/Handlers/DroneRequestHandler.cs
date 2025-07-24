@@ -14,7 +14,9 @@ public class DroneRequestHandler : IVehicleRequestHandler
 
     public bool IsMatch(Vehicle request)
     {
-        return request is AddDroneRequest;
+        var isAddDroneRequest = request is AddDroneRequest;
+        
+        return isAddDroneRequest;
     }
 
     public Vehicle Handle(Vehicle request)

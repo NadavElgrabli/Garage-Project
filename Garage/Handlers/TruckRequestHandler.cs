@@ -14,7 +14,9 @@ public class TruckRequestHandler : IVehicleRequestHandler
 
     public bool IsMatch(Vehicle request)
     {
-        return request is AddTruckRequest;
+        var isTruckRequest = request is AddTruckRequest;
+        
+        return isTruckRequest;
     }
 
     public Vehicle Handle(Vehicle request)

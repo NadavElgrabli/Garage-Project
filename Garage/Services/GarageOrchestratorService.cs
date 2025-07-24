@@ -51,6 +51,14 @@ public class GarageOrchestratorService
         var treatmentRequests = _garageManagementService.GenerateFuelCarTreatmentRequests(car, request);
         _listProcessorService.AddVehicleRequestsToMatchingList(treatmentRequests);
     }
+    
+    public void AddFuelMotorcycle(AddFuelMotorcycleRequest request)
+    {
+        _validationService.CheckValidFuelMotorcycleInput(request);
+        var motorcycle = _garageManagementService.CreateAndAddVehicleToGarage(request);
+        var treatmentRequests = _garageManagementService.GenerateFuelMotorcycleTreatmentRequests(motorcycle, request);
+        _listProcessorService.AddVehicleRequestsToMatchingList(treatmentRequests);
+    }
 
     public void AddTruck(AddTruckRequest request)
     {
@@ -64,6 +72,9 @@ public class GarageOrchestratorService
     {
         _validationService.CheckValidDroneInput(request);
         var drone =  _garageManagementService.CreateAndAddVehicleToGarage(request);
-        
+        var treatmentRequests = _garageManagementService.GenerateDroneTreatmentRequest(drone, request);
+        _listProcessorService.AddVehicleRequestsToMatchingList(treatmentRequests);
     }
+    
+    
 }

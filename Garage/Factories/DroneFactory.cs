@@ -16,7 +16,7 @@ public class DroneFactory : IVehicleFactory
             ModelName = droneRequest.ModelName,
             LicensePlate = droneRequest.LicensePlate,
             RemainingEnergyPercentage = droneRequest.RemainingEnergyPercentage,
-            Engines = droneRequest.Engines,
+            Engine = droneRequest.Engine,
             Owner = droneRequest.Owner,
             Status = Status.Pending,
             VehicleType = droneRequest.VehicleType,

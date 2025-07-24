@@ -29,6 +29,11 @@ public class ValidationService
 
     public void CheckValidDroneInput(AddDroneRequest request)
     {
-        
+        _validationRepository.CheckValidDroneInput(request);
+    }
+
+    public void CheckValidFuelMotorcycleInput(AddFuelMotorcycleRequest request)
+    {
+        _validationRepository.CheckValidFuelMotorcycleInput(request);
     }
 }

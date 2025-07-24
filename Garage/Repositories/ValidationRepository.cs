@@ -11,14 +11,20 @@ public class ValidationRepository : IValidationRepository
 
     private readonly float _maxElectricCarEnergy;
     private readonly float _maxFuelCarEnergy;
+    private readonly float _maxFuelMotorcycleEnergy;
     private readonly float _maxTruckEnergy;
     private readonly float _maxDroneEnergy;
+    
     private readonly int _minTreatments;
     private readonly int _maxTreatments;
+    
     private readonly int _numberOfCarWheels;
     private readonly int _numberOfTruckWheels;
+    private readonly int _numberOfMotorcycleWheels;
+    
     private readonly float _carWheelMaxPressure;
     private readonly float _truckWheelMaxPressure;
+    private readonly float _motorcycleWheelMaxPressure;
 
     public ValidationRepository(GarageState garageState,  InMemoryDatabase db, IConfiguration  config)
     {
@@ -28,12 +34,15 @@ public class ValidationRepository : IValidationRepository
         _maxElectricCarEnergy = config.GetValue<float>("Validation:MaxElectricCarEnergy");
         _maxFuelCarEnergy = config.GetValue<float>("Validation:MaxFuelCarEnergy");
         _maxTruckEnergy = config.GetValue<float>("Validation:MaxTruckEnergy");
+        _maxFuelMotorcycleEnergy =  config.GetValue<float>("Validation:MaxFuelMotorcycleEnergy");
         _maxDroneEnergy = config.GetValue<float>("Validation:MaxDroneEnergy");
         _minTreatments = config.GetValue<int>("Validation:MinimumNumberOfTreatments");
         _maxTreatments = config.GetValue<int>("Validation:MaximumNumberOfTreatments");
         _numberOfCarWheels = config.GetValue<int>("Validation:NumberOfCarWheels");
+        _numberOfMotorcycleWheels =  config.GetValue<int>("Validation:NumberOfMotorcycleWheels");
         _numberOfTruckWheels = config.GetValue<int>("Validation:NumberOfTruckWheels");
         _carWheelMaxPressure = config.GetValue<float>("Validation:CarWheelMaxPressure");
+        _motorcycleWheelMaxPressure =  config.GetValue<float>("Validation:MotorcycleWheelMaxPressure");
         _truckWheelMaxPressure = config.GetValue<float>("Validation:TruckWheelMaxPressure");
     }
     
@@ -43,9 +52,7 @@ public class ValidationRepository : IValidationRepository
         var errorData = new Dictionary<string, object>();
 
         ValidateCommonVehicleInput(request, errors);
-        
         ValidateEngine(request.Engine, _maxElectricCarEnergy, errors, errorData);
-
         ValidateWheels(
             request.Wheels,
             request.DesiredWheelPressures,
@@ -76,14 +83,45 @@ public class ValidationRepository : IValidationRepository
         var errorData = new Dictionary<string, object>();
 
         ValidateCommonVehicleInput(request, errors);
-        
         ValidateEngine(request.Engine, _maxFuelCarEnergy, errors, errorData);
-
         ValidateWheels(
             request.Wheels,
             request.DesiredWheelPressures,
             _numberOfCarWheels,
             _carWheelMaxPressure,
+            errors,
+            errorData
+        );
+        
+        if (request.TreatmentTypes.Contains(TreatmentType.Recharge))
+            errors.Add("Cannot have a recharge treatment for a fuel car.");
+
+        if (errors.Any())
+        {
+            var message = "Invalid input:\n- " + string.Join("\n- ", errors);
+            var ex = new InvalidOperationException(message);
+
+            foreach (var pair in errorData)
+            {
+                ex.Data[pair.Key] = pair.Value;
+            }
+
+            throw ex;
+        }
+    }
+    
+    public void CheckValidFuelMotorcycleInput(AddFuelMotorcycleRequest request)
+    {
+        var errors = new List<string>();
+        var errorData = new Dictionary<string, object>();
+
+        ValidateCommonVehicleInput(request, errors);
+        ValidateEngine(request.Engine, _maxFuelMotorcycleEnergy, errors, errorData);
+        ValidateWheels(
+            request.Wheels,
+            request.DesiredWheelPressures,
+            _numberOfMotorcycleWheels,
+            _motorcycleWheelMaxPressure,
             errors,
             errorData
         );
@@ -124,7 +162,7 @@ public class ValidationRepository : IValidationRepository
         var errorData = new Dictionary<string, object>();
 
         ValidateCommonVehicleInput(request, errors);
-        
+        ValidateEngine(request.Engine, _maxTruckEnergy, errors, errorData);
         ValidateWheels(
             request.Wheels,
             request.DesiredWheelPressures,
@@ -133,8 +171,6 @@ public class ValidationRepository : IValidationRepository
             errors,
             errorData
         );
-        
-        ValidateEngine(request.Engine, _maxTruckEnergy, errors, errorData);
 
         if (request.TreatmentTypes.Contains(TreatmentType.Recharge))
             errors.Add("Cannot have a recharge treatment for a truck.");
@@ -157,8 +193,7 @@ public class ValidationRepository : IValidationRepository
         var errorData = new Dictionary<string, object>();
 
         ValidateCommonVehicleInput(request, errors);
-
-        ValidateDroneEngines(request.Engines, _maxDroneEnergy, errors, errorData);
+        ValidateEngine(request.Engine, _maxDroneEnergy, errors, errorData);
 
         if (request.TreatmentTypes.Contains(TreatmentType.Refuel))
             errors.Add("Cannot have a refuel treatment for a drone.");
@@ -215,26 +250,6 @@ public class ValidationRepository : IValidationRepository
         {
             errors.Add("Engine's max energy is above the allowed maximum of energy.");
             errorData["Engine_MaxEnergy"] = engine.MaxEnergy;
-        }
-    }
-    
-    private void ValidateDroneEngines(List<Engine> engines, float maxEnergy, List<string> errors, Dictionary<string, object> errorData)
-    {
-        for (int i = 0; i < engines.Count; i++)
-        {
-            var engine = engines[i];
-
-            if (engine.CurrentEnergy > engine.MaxEnergy)
-            {
-                errors.Add($"Engine #{i}: current energy is higher than its maximum capacity.");
-                errorData[$"Engine_{i}_CurrentEnergy"] = engine.CurrentEnergy;
-            }
-
-            if (engine.MaxEnergy > maxEnergy)
-            {
-                errors.Add($"Engine #{i}: max energy is above the allowed maximum of {maxEnergy}.");
-                errorData[$"Engine_{i}_MaxEnergy"] = engine.MaxEnergy;
-            }
         }
     }
 }

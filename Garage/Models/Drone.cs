@@ -4,6 +4,6 @@ namespace Garage.Models;
 
 public class Drone : Vehicle
 {
-    public List<Engine> Engines { get; set; }
+    public Engine Engine { get; set; }
     public DroneControl ControlOptions { get; set; }
 }
