@@ -81,6 +81,7 @@ public class GarageManagementService
     {
         var v = CreateVehicle(vehicle);
         AddVehicleToGarage(v);
+        
         return v;
     }
     

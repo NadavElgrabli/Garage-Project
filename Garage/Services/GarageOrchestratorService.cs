@@ -83,6 +83,4 @@ public class GarageOrchestratorService
         var treatmentRequests = _garageManagementService.GenerateDroneTreatmentRequest(drone, request);
         _listProcessorService.AddVehicleRequestsToMatchingList(treatmentRequests);
     }
-    
-    
 }
