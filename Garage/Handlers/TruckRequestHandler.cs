@@ -21,9 +21,8 @@ public class TruckRequestHandler : IVehicleRequestHandler
 
     public Vehicle Handle(Vehicle request)
     {
-        if (request is not AddTruckRequest)
-            throw new ArgumentException("Invalid request type for TruckRequestHandler");
-
-        return _factory.CreateVehicle(request);
+        var vehicle = _factory.CreateVehicle(request);
+        
+        return vehicle;
     }
 }

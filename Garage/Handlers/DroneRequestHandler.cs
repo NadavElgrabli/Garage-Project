@@ -21,9 +21,8 @@ public class DroneRequestHandler : IVehicleRequestHandler
 
     public Vehicle Handle(Vehicle request)
     {
-        if (request is not AddDroneRequest)
-            throw new ArgumentException("Invalid request type for DroneRequestHandler");
-
-        return _factory.CreateVehicle(request);
+        var vehicle = _factory.CreateVehicle(request);
+        
+        return vehicle;
     }
 }

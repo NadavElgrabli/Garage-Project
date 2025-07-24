@@ -4,17 +4,7 @@ using Garage.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Garage.Controllers;
-//TODO's:
-// 1) check: enter before return - done
-// 2) check: "== null" - done
-// 3) check: no {} for 1 line ifs - done
-// 4) check: always create new var before returning - done
-// 5) In handlers, use repository when you call db - done
-// 6) Create a new class (Under Garage) called ConfigurationKeys. This class will have the route
-// for each of the appsettings.json key, save as const and then use as shortcut where they
-// are used - done
-// 7) In GarageManagementService, create handlers for generating treatmentRequests (I dont like
-// the ifs every time)
+
 [ApiController]
 [Route("api/[controller]")]
 public class GarageController : ControllerBase

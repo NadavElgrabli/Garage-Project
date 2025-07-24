@@ -21,9 +21,8 @@ public class FuelCarRequestHandler : IVehicleRequestHandler
 
     public Vehicle Handle(Vehicle request)
     {
-        if (request is not AddFuelCarRequest)
-            throw new ArgumentException("Invalid request type for FuelCarRequestHandler");
-
-        return _factory.CreateVehicle(request);
+        var vehicle = _factory.CreateVehicle(request);
+        
+        return vehicle;
     }
 }

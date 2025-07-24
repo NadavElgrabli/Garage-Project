@@ -31,10 +31,7 @@ public class ValidationRepository : IValidationRepository
     {
         _garageState  = garageState;
         _db = db;
-
-        // TODO: Create a new class (Under Garage) called ConfigurationKeys. This class will have the route
-        // for each of the appsettings.json key, for example in this case: Validation:MaxElectricCarEnergy,
-        // save as const and then use as shortcut here below
+        
         _maxElectricCarEnergy = config.GetValue<float>(ConfigurationKeys.Validation.MaxElectricCarEnergy);
         _maxFuelCarEnergy = config.GetValue<float>(ConfigurationKeys.Validation.MaxFuelCarEnergy);
         _maxTruckEnergy = config.GetValue<float>(ConfigurationKeys.Validation.MaxTruckEnergy);

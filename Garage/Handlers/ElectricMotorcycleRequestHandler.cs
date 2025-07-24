@@ -21,9 +21,8 @@ public class ElectricMotorcycleRequestHandler : IVehicleRequestHandler
 
     public Vehicle Handle(Vehicle request)
     {
-        if (request is not AddElectricMotorcycleRequest)
-            throw new ArgumentException("Invalid request type for ElectricMotorcycleRequestHandler");
-
-        return _factory.CreateVehicle(request);
+        var vehicle = _factory.CreateVehicle(request);
+        
+        return vehicle;
     }
 }
