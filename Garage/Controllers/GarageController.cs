@@ -13,12 +13,11 @@ namespace Garage.Controllers;
 // in the exceptions you throw, use exception params instead.
 // use https://www.ashtamkea.com/p/csharpexeptionhandling.html - done
 // 6) Use IConfiguration for magic numbers (validation repository / services/ etc..) - done
-// 7) In the tests, use DP for InMemoryDatabase instead of creating a new class?
-// 8) check: enter before return - 
-// 9) check: "== null" - 
-// 10) check: no {} for 1 line ifs -
-// 11) check: always create new var before returning
-// 12) move all treatments to handlers, they aren't services -
+// 7) check: enter before return - 
+// 8) check: "== null" - 
+// 9) check: no {} for 1 line ifs -
+// 10) check: always create new var before returning
+// 11) move all treatments to handlers, they aren't services -
 [ApiController]
 [Route("api/[controller]")]
 public class GarageController : ControllerBase

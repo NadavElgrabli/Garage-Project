@@ -37,16 +37,14 @@ public class InflateService : ITreatmentService
             for (int i = 0; i < airRequest.Wheels.Count; i++)
             {
                 var wheel = airRequest.Wheels[i];
-                float target = desiredPressures[i]; // target is 10, current is 2, max is 8
+                float target = desiredPressures[i];
 
-                // Wheel exploded from over pressure, e.g: target is 10, current is 2, max pressure is 8
                 if (target > wheel.MaxPressure)
                 {
                     await Task.Delay((int)(wheel.MaxPressure - wheel.CurrentPressure) * _delayPerPressureUnitInMilliseconds);
                     wheel.CurrentPressure = 0;
                     totalPrice += _explosionPenalty;
                 }
-                //current pressure is 2, max pressure is 8, target is 8 or lower
                 else
                 {
                     float pressureToAdd = MathF.Max(0, target - wheel.CurrentPressure);

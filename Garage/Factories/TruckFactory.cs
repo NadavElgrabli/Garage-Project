@@ -16,12 +16,6 @@ public class TruckFactory : IVehicleFactory
             ModelName = truckRequest.ModelName,
             LicensePlate = truckRequest.LicensePlate,
             RemainingEnergyPercentage = truckRequest.RemainingEnergyPercentage,
-            // Engine = new FuelEngine
-            // {
-            //     CurrentEnergy = truckRequest.Engine.CurrentEnergy,
-            //     MaxEnergy = truckRequest.Engine.MaxEnergy,
-            //     FuelType = FuelType.Solar
-            // },
             Engine = truckRequest.Engine,
             Owner = truckRequest.Owner,
             Wheels = truckRequest.Wheels,

@@ -36,24 +36,20 @@ public class RechargeService : ITreatmentService
             float energyToFullCharge = chargeRequest.Engine.MaxEnergy - chargeRequest.Engine.CurrentEnergy;
             float totalPrice = hoursToCharge * _pricePerHour;
             
-            // Overflow of charge (for example current energy was 2, max energy is 5, but requested to charge 10 hours)
             if (chargeRequest.Engine.CurrentEnergy + hoursToCharge > chargeRequest.Engine.MaxEnergy)
             {
-                // total price will be of 3 hours
                 totalPrice = (energyToFullCharge) * _pricePerHour;
-                // penalty for overcharge
                 totalPrice += _overchargePenalty;
-                // we will wait the time to fully charge 3 hours (until max energy which is 5)
                 int timeToFullyCharge = (int)(energyToFullCharge) * (_millisecondsPerHour);
+                
                 await Task.Delay(timeToFullyCharge);
+                
                 var random = new Random();
-                // the current energy will be random between the current energy and max energy because the engine is overflowed and messed up
                 float min = chargeRequest.Engine.CurrentEnergy;
                 float max = chargeRequest.Engine.MaxEnergy;
-
+                
                 chargeRequest.Engine.CurrentEnergy = (float)(random.NextDouble() * (max - min) + min);
             }
-            // We recharge it to the maximum or less
             else
             {
                 int milliseconds = (int)(hoursToCharge * _millisecondsPerHour);
@@ -64,7 +60,6 @@ public class RechargeService : ITreatmentService
             vehicle.TreatmentsPrice += totalPrice;
             vehicle.TreatmentTypes.Remove(TreatmentType.Recharge);
             vehicle.Status = vehicle.TreatmentTypes.Count == 0 ? Status.Ready : Status.Pending;
-
         }
         finally
         {
