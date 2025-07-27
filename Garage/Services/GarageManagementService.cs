@@ -71,7 +71,7 @@ public class GarageManagementService
     
     private Vehicle CreateVehicle(Vehicle request)
     {
-        var handler = _handlers.FirstOrDefault(h => h.IsMatch(request))
+        var handler = _handlers.FirstOrDefault(vehicleRequestHandler => vehicleRequestHandler.IsMatch(request))
                       ?? throw new InvalidOperationException("No handler found for this vehicle type");
 
         return handler.Handle(request);
@@ -79,10 +79,10 @@ public class GarageManagementService
 
     public Vehicle CreateAndAddVehicleToGarage(Vehicle vehicle)
     {
-        var v = CreateVehicle(vehicle);
-        AddVehicleToGarage(v);
+        var createdVehicle = CreateVehicle(vehicle);
+        AddVehicleToGarage(createdVehicle);
         
-        return v;
+        return createdVehicle;
     }
     
     public List<VehicleInfo> DisplayVehiclesByStatus(Status status)
